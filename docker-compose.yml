@@ -1,0 +1,12 @@
+services:
+  frontend:
+    image: ghcr.io/minhhquann1508/lms-fe-v2:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api}
+    container_name: lms-fe-v2
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
