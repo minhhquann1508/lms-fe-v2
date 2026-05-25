@@ -19,7 +19,6 @@ import {
   Layout,
   Progress,
   Result,
-  Space,
   Spin,
   Tabs,
   Tag,
@@ -30,7 +29,6 @@ import {
 import {
   BackwardOutlined,
   CheckCircleFilled,
-  CheckCircleOutlined,
   ClockCircleOutlined,
   FileTextOutlined,
   MenuFoldOutlined,
@@ -63,8 +61,6 @@ import type {
   EnrollmentLectureProgressSnapshot,
   LectureProgressAction,
   LectureProgressItem,
-  Quiz,
-  QuizAttempt,
 } from '@/types';
 
 const { Sider, Content } = Layout;
@@ -72,6 +68,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const PLAYER_JS_URL = 'https://assets.mediadelivery.net/playerjs/playerjs-latest.min.js';
 const LEARNING_SIDER_WIDTH = '33.33vw';
+const AUTO_ADVANCE_MESSAGE_KEY = 'learning-auto-advance';
 const DEFAULT_LEARNING_STATE: EnrollmentLearningState = {
   version: 1 as const,
   activeLectureId: null,
@@ -169,6 +166,33 @@ function formatDurationLabel(totalSeconds: number): string {
   }
 
   return `${seconds} giây`;
+}
+
+function getCompletionThreshold(duration: number): number {
+  if (duration <= 0) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  return Math.max(duration - 5, duration * 0.95);
+}
+
+export function shouldSyncLectureTimeUpdate(
+  watchedSeconds: number,
+  duration: number,
+  lastSyncedSeconds: number,
+): boolean {
+  const nextSeconds = Math.max(0, Math.floor(watchedSeconds));
+  const nextDuration = Math.max(0, Math.floor(duration));
+
+  if (nextSeconds === 0) {
+    return false;
+  }
+
+  if (nextDuration > 0 && nextSeconds >= getCompletionThreshold(nextDuration)) {
+    return true;
+  }
+
+  return nextSeconds >= nextDuration || nextSeconds - lastSyncedSeconds >= 10;
 }
 
 function isBunnyEmbedUrl(url: string): boolean {
@@ -326,14 +350,21 @@ export default function LearningPage() {
 
       queryClient.setQueryData<Enrollment | undefined>(
         queryKeys.enrollments.detail(enrollmentId),
-        (currentEnrollment) =>
-          currentEnrollment
-            ? {
-                ...currentEnrollment,
-                ...updatedEnrollment,
-                course: updatedEnrollment.course ?? currentEnrollment.course,
-              }
-            : updatedEnrollment,
+        (currentEnrollment) => {
+          if (!currentEnrollment) {
+            return updatedEnrollment;
+          }
+
+          const updatedCourseHasLectures = updatedEnrollment.course?.chapters?.some(
+            (chapter) => (chapter.lectures?.length ?? 0) > 0,
+          );
+
+          return {
+            ...currentEnrollment,
+            ...updatedEnrollment,
+            course: updatedCourseHasLectures ? updatedEnrollment.course : currentEnrollment.course,
+          };
+        },
       );
     },
   });
@@ -418,12 +449,6 @@ export default function LearningPage() {
     currentLectureProgress?.watchedSeconds ?? 0,
     Math.floor(playerTelemetry.currentTime),
   );
-  const currentLectureProgressPercent =
-    currentLectureDuration > 0
-      ? Math.min(100, Math.round((currentLectureSeconds / currentLectureDuration) * 100))
-      : currentLectureProgress?.isCompleted
-        ? 100
-        : 0;
   const canUsePlaybackControls =
     playerMode === 'native' || (playerMode === 'bunny' && playerCapabilities.playback);
   const canUseSeekControls =
@@ -611,7 +636,7 @@ export default function LearningPage() {
     [persistLearningState],
   );
 
-  const syncProgress = useEffectEvent(
+  const syncProgress = useCallback(
     (action: LectureProgressAction, watchedSeconds: number, duration?: number) => {
       if (!enrollmentId || !currentLecture) {
         return;
@@ -625,6 +650,7 @@ export default function LearningPage() {
         duration: duration && duration > 0 ? Math.floor(duration) : currentLecture.duration,
       });
     },
+    [currentLecture, enrollmentId, syncMutation],
   );
 
   const maybeSyncTimeUpdate = useEffectEvent((watchedSeconds: number, duration: number) => {
@@ -636,7 +662,7 @@ export default function LearningPage() {
     const nextSeconds = Math.max(0, Math.floor(watchedSeconds));
     const lastSyncedSeconds = lastSyncedSecondsRef.current.get(lectureId) ?? 0;
 
-    if (nextSeconds === 0 || (nextSeconds < duration && nextSeconds - lastSyncedSeconds < 10)) {
+    if (!shouldSyncLectureTimeUpdate(nextSeconds, duration, lastSyncedSeconds)) {
       return;
     }
 
@@ -971,6 +997,26 @@ export default function LearningPage() {
   }, [autoAdvanceCountdown, currentLecture, nextLecture, selectLecture]);
 
   useEffect(() => {
+    if (!autoAdvanceCountdown || !nextLecture) {
+      message.destroy(AUTO_ADVANCE_MESSAGE_KEY);
+      return;
+    }
+
+    message.open({
+      key: AUTO_ADVANCE_MESSAGE_KEY,
+      type: 'success',
+      content: `Sẽ chuyển bài sau ${autoAdvanceCountdown}...`,
+      duration: 0,
+    });
+  }, [autoAdvanceCountdown, nextLecture]);
+
+  useEffect(() => {
+    return () => {
+      message.destroy(AUTO_ADVANCE_MESSAGE_KEY);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
@@ -1219,12 +1265,6 @@ export default function LearningPage() {
     window.setTimeout(() => {
       noteInputRef.current?.focus();
     }, 0);
-  };
-
-  const handleMarkComplete = () => {
-    const completedAt =
-      currentLectureDuration || currentLecture?.duration || currentTimeRef.current;
-    syncProgress('ended', completedAt, completedAt);
   };
 
   useEffect(() => {
@@ -1909,20 +1949,6 @@ export default function LearningPage() {
                   </div>
                 </div>
               </Card>
-
-              {autoAdvanceCountdown ? (
-                <Alert
-                  className="lms-learning-alert"
-                  action={
-                    <Button onClick={() => setAutoAdvanceCountdown(null)} size="small">
-                      Ở lại bài này
-                    </Button>
-                  }
-                  title={`Sẽ tự chuyển sang "${nextLecture?.name}" sau ${autoAdvanceCountdown} giây.`}
-                  showIcon
-                  type="success"
-                />
-              ) : null}
 
               <Tabs
                 activeKey={activeTab}

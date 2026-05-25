@@ -13,7 +13,7 @@ import { queryKeys } from '@/config/query-keys';
 import { notificationService } from '@/services';
 import { useAuthStore } from '@/store/auth.store';
 import { colors } from '@/config/theme';
-import type { Notification } from '@/types';
+import type { Notification, PaginatedResponse } from '@/types';
 
 const { Text } = Typography;
 
@@ -71,7 +71,7 @@ function NotificationItem({
   onMarkRead,
 }: {
   notification: Notification;
-  onMarkRead: (id: string) => void;
+  onMarkRead: (id: string) => Promise<void>;
 }) {
   const navigate = useNavigate();
   const config = getConfig(notification.type);
@@ -81,6 +81,10 @@ function NotificationItem({
       className={`lms-ntf-item ${notification.isRead ? '' : 'lms-ntf-item--unread'}`}
       onClick={async () => {
         try {
+          if (!notification.isRead) {
+            await onMarkRead(notification.id);
+          }
+
           if (notification.link) {
             navigate(notification.link);
           }
@@ -103,7 +107,7 @@ function NotificationItem({
           className="lms-ntf-item__mark"
           onClick={(e) => {
             e.stopPropagation();
-            onMarkRead(notification.id);
+            void onMarkRead(notification.id);
           }}
           title="Đánh dấu đã đọc"
         >
@@ -133,6 +137,22 @@ export default function NotificationDropdown() {
 
   const markAsReadMutation = useMutation({
     mutationFn: (id: string) => notificationService.markAsRead(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.notifications.all });
+
+      queryClient.setQueriesData<PaginatedResponse<Notification>>(
+        { queryKey: queryKeys.notifications.all },
+        (current) =>
+          current
+            ? {
+                ...current,
+                items: current.items.map((item) =>
+                  item.id === id ? { ...item, isRead: true } : item,
+                ),
+              }
+            : current,
+      );
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
     },
@@ -176,7 +196,7 @@ export default function NotificationDropdown() {
             <NotificationItem
               key={notification.id}
               notification={notification}
-              onMarkRead={(id) => markAsReadMutation.mutate(id)}
+              onMarkRead={(id) => markAsReadMutation.mutateAsync(id)}
             />
           ))
         )}

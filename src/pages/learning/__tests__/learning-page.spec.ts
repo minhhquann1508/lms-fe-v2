@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveInitialLectureId } from '../LearningPage';
+import { resolveInitialLectureId, shouldSyncLectureTimeUpdate } from '../LearningPage';
 import type { LectureProgressItem } from '@/types';
 
 const makeProgress = (
@@ -49,5 +49,17 @@ describe('resolveInitialLectureId', () => {
     const result = resolveInitialLectureId(lectures, null, progressMap);
 
     expect(result).toBe('lecture-3');
+  });
+});
+
+describe('shouldSyncLectureTimeUpdate', () => {
+  it('does not throttle the completion threshold update', () => {
+    expect(shouldSyncLectureTimeUpdate(95, 100, 90)).toBe(true);
+    expect(shouldSyncLectureTimeUpdate(99, 100, 90)).toBe(true);
+  });
+
+  it('keeps regular time updates throttled before completion threshold', () => {
+    expect(shouldSyncLectureTimeUpdate(94, 100, 90)).toBe(false);
+    expect(shouldSyncLectureTimeUpdate(100, 100, 90)).toBe(true);
   });
 });

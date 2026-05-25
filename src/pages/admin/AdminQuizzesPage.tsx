@@ -227,7 +227,9 @@ export default function AdminQuizzesPage() {
       headerAlign: 'center' as const,
       render: (title: string, record: { id: string }) => (
         <Link to={`/admin/quizzes/${record.id}`}>
-          <Text ellipsis={{ tooltip: true }} style={{ color: 'inherit' }}>{title}</Text>
+          <Text ellipsis={{ tooltip: true }} style={{ color: 'inherit' }}>
+            {title}
+          </Text>
         </Link>
       ),
     },
@@ -321,9 +323,7 @@ export default function AdminQuizzesPage() {
       ) => (
         <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
           <Link to={`/admin/quizzes/${record.id}/edit`}>
-            <Button icon={<EditOutlined />} size="small" type="link">
-              Sửa
-            </Button>
+            <Button icon={<EditOutlined />} size="small" type="text" />
           </Link>
           <Popconfirm
             cancelText="Huỷ"
@@ -520,7 +520,9 @@ export default function AdminQuizzesPage() {
               background: '#fafafa',
             }}
           >
-            <UploadOutlined style={{ fontSize: 32, color: '#999', marginBottom: 8, display: 'block' }} />
+            <UploadOutlined
+              style={{ fontSize: 32, color: '#999', marginBottom: 8, display: 'block' }}
+            />
             <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
               Kéo thả file Excel (.xlsx, .xls) vào đây hoặc click để chọn file
             </Text>
@@ -552,9 +554,7 @@ export default function AdminQuizzesPage() {
             )}
           </div>
 
-          {importError && (
-            <Alert message={importError} showIcon type="error" />
-          )}
+          {importError && <Alert message={importError} showIcon type="error" />}
 
           {importResult && (
             <div>
@@ -581,7 +581,9 @@ export default function AdminQuizzesPage() {
                       </div>
                       <ul style={{ margin: 0, paddingLeft: 16 }}>
                         {importResult.errors.slice(0, 5).map((err, i) => (
-                          <li key={i}>Dòng {err.row}: {err.message}</li>
+                          <li key={i}>
+                            Dòng {err.row}: {err.message}
+                          </li>
                         ))}
                         {importResult.errors.length > 5 && (
                           <li>...và {importResult.errors.length - 5} lỗi khác</li>
