@@ -1,7 +1,7 @@
 import { Tabs, Form, Input, Button, message, Divider } from 'antd';
 import { GoogleOutlined, MailOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, registerSchema } from '@/schemas';
@@ -18,12 +18,23 @@ import type { ActiveLoginDevice } from '@/types';
 
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
+  const [revoking, setRevoking] = useState(false);
   const [deviceLimitOpen, setDeviceLimitOpen] = useState(false);
   const [activeDevices, setActiveDevices] = useState<ActiveLoginDevice[]>([]);
   const [forgotMode, setForgotMode] = useState<'login' | 'forgot' | 'sent'>('login');
   const [forgotEmail, setForgotEmail] = useState('');
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { setAuth } = useAuthStore();
+
+  // Read revokeSessionId from URL (set by GoogleCallbackPage redirect)
+  const pendingRevokeSessionId = useRef(searchParams.get('revokeSessionId'));
+  // Clean up the URL param after reading
+  if (pendingRevokeSessionId.current && searchParams.has('revokeSessionId')) {
+    const next = new URLSearchParams(searchParams);
+    next.delete('revokeSessionId');
+    setSearchParams(next, { replace: true });
+  }
 
   /* ── Login form ── */
   const loginForm = useForm<LoginFormValues>({
@@ -31,11 +42,11 @@ export default function AuthPage() {
     defaultValues: { email: '', password: '' },
   });
 
-  const onLogin = async (values: LoginFormValues) => {
+  const doLogin = async (values: LoginFormValues, revokeSessionId?: string) => {
     setLoading(true);
     try {
       const device = getDeviceInfo();
-      const res = await authService.login({ ...values, device });
+      const res = await authService.login({ ...values, device, revokeSessionId });
       setAuth(res.data.userInfo, res.data.token);
       message.success('Đăng nhập thành công!');
 
@@ -61,6 +72,33 @@ export default function AuthPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onLogin = (values: LoginFormValues) => {
+    const revokeId = pendingRevokeSessionId.current ?? undefined;
+    pendingRevokeSessionId.current = null; // only use once
+    return doLogin(values, revokeId);
+  };
+
+  /**
+   * Revoke the earliest active session and retry login.
+   * Sessions are sorted by loginAt DESC — the last element is the earliest.
+   */
+  const handleRevokeEarliest = () => {
+    if (activeDevices.length === 0) return;
+    const earliest = activeDevices[activeDevices.length - 1];
+    if (!earliest.sessionId) {
+      message.error('Không thể xác định phiên đăng nhập sớm nhất.');
+      return;
+    }
+
+    const currentValues = loginForm.getValues();
+    setRevoking(true);
+    setDeviceLimitOpen(false);
+
+    doLogin(currentValues, earliest.sessionId).finally(() => {
+      setRevoking(false);
+    });
   };
 
   /* ── Register form ── */
@@ -121,8 +159,8 @@ export default function AuthPage() {
           <MailOutlined style={{ fontSize: 40, color: '#1677ff', marginBottom: 16 }} />
           <h2>Kiểm tra email của bạn</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
-            Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu tới{' '}
-            <strong>{forgotEmail}</strong>. Vui lòng kiểm tra hộp thư.
+            Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu tới <strong>{forgotEmail}</strong>. Vui lòng
+            kiểm tra hộp thư.
           </p>
           <Button type="link" onClick={() => setForgotMode('login')}>
             Quay lại đăng nhập
@@ -166,185 +204,187 @@ export default function AuthPage() {
         </div>
       ) : (
         /* ── Login / Register tabs ── */
-      <Tabs
-        className="lms-auth-tabs"
-        defaultActiveKey="login"
-        centered
-        items={[
-          {
-            key: 'login',
-            label: 'Đăng nhập',
-            children: (
-              <form onSubmit={loginForm.handleSubmit(onLogin)}>
-                <Controller
-                  name="email"
-                  control={loginForm.control}
-                  render={({ field, fieldState }) => (
-                    <Form.Item
-                      validateStatus={fieldState.error ? 'error' : undefined}
-                      help={fieldState.error?.message}
-                      style={{ marginBottom: 16 }}
-                    >
-                      <Input
-                        {...field}
-                        prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
-                        placeholder="Email"
-                        size="large"
-                        id="login-email"
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Controller
-                  name="password"
-                  control={loginForm.control}
-                  render={({ field, fieldState }) => (
-                    <Form.Item
-                      validateStatus={fieldState.error ? 'error' : undefined}
-                      help={fieldState.error?.message}
-                      style={{ marginBottom: 24 }}
-                    >
-                      <Input.Password
-                        {...field}
-                        prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
-                        placeholder="Mật khẩu"
-                        size="large"
-                        id="login-password"
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  block
-                  size="large"
-                  id="login-submit"
-                >
-                  Đăng nhập
-                </Button>
-
-                <div style={{ textAlign: 'right', marginTop: 8, marginBottom: 8 }}>
-                  <Button type="link" size="small" onClick={() => setForgotMode('forgot')}>
-                    Quên mật khẩu?
+        <Tabs
+          className="lms-auth-tabs"
+          defaultActiveKey="login"
+          centered
+          items={[
+            {
+              key: 'login',
+              label: 'Đăng nhập',
+              children: (
+                <form onSubmit={loginForm.handleSubmit(onLogin)}>
+                  <Controller
+                    name="email"
+                    control={loginForm.control}
+                    render={({ field, fieldState }) => (
+                      <Form.Item
+                        validateStatus={fieldState.error ? 'error' : undefined}
+                        help={fieldState.error?.message}
+                        style={{ marginBottom: 16 }}
+                      >
+                        <Input
+                          {...field}
+                          prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
+                          placeholder="Email"
+                          size="large"
+                          id="login-email"
+                        />
+                      </Form.Item>
+                    )}
+                  />
+                  <Controller
+                    name="password"
+                    control={loginForm.control}
+                    render={({ field, fieldState }) => (
+                      <Form.Item
+                        validateStatus={fieldState.error ? 'error' : undefined}
+                        help={fieldState.error?.message}
+                        style={{ marginBottom: 24 }}
+                      >
+                        <Input.Password
+                          {...field}
+                          prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
+                          placeholder="Mật khẩu"
+                          size="large"
+                          id="login-password"
+                        />
+                      </Form.Item>
+                    )}
+                  />
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    block
+                    size="large"
+                    id="login-submit"
+                  >
+                    Đăng nhập
                   </Button>
-                </div>
 
-                <Divider plain>hoặc</Divider>
-                <Button
-                  block
-                  size="large"
-                  icon={<GoogleOutlined />}
-                  onClick={handleGoogleLogin}
-                  id="google-login"
-                >
-                  Đăng nhập bằng Google
-                </Button>
-              </form>
-            ),
-          },
-          {
-            key: 'register',
-            label: 'Đăng ký',
-            children: (
-              <form onSubmit={registerForm.handleSubmit(onRegister)}>
-                <Controller
-                  name="fullName"
-                  control={registerForm.control}
-                  render={({ field, fieldState }) => (
-                    <Form.Item
-                      validateStatus={fieldState.error ? 'error' : undefined}
-                      help={fieldState.error?.message}
-                      style={{ marginBottom: 16 }}
-                    >
-                      <Input
-                        {...field}
-                        prefix={<UserOutlined style={{ color: '#9ca3af' }} />}
-                        placeholder="Họ tên"
-                        size="large"
-                        id="register-fullname"
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Controller
-                  name="email"
-                  control={registerForm.control}
-                  render={({ field, fieldState }) => (
-                    <Form.Item
-                      validateStatus={fieldState.error ? 'error' : undefined}
-                      help={fieldState.error?.message}
-                      style={{ marginBottom: 16 }}
-                    >
-                      <Input
-                        {...field}
-                        prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
-                        placeholder="Email"
-                        size="large"
-                        id="register-email"
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Controller
-                  name="password"
-                  control={registerForm.control}
-                  render={({ field, fieldState }) => (
-                    <Form.Item
-                      validateStatus={fieldState.error ? 'error' : undefined}
-                      help={fieldState.error?.message}
-                      style={{ marginBottom: 16 }}
-                    >
-                      <Input.Password
-                        {...field}
-                        prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
-                        placeholder="Mật khẩu (ít nhất 6 ký tự)"
-                        size="large"
-                        id="register-password"
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Controller
-                  name="confirmPassword"
-                  control={registerForm.control}
-                  render={({ field, fieldState }) => (
-                    <Form.Item
-                      validateStatus={fieldState.error ? 'error' : undefined}
-                      help={fieldState.error?.message}
-                      style={{ marginBottom: 24 }}
-                    >
-                      <Input.Password
-                        {...field}
-                        prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
-                        placeholder="Xác nhận mật khẩu"
-                        size="large"
-                        id="register-confirm-password"
-                      />
-                    </Form.Item>
-                  )}
-                />
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  block
-                  size="large"
-                  id="register-submit"
-                >
-                  Đăng ký
-                </Button>
-              </form>
-            ),
-          },
-        ]}
-      />
+                  <div style={{ textAlign: 'right', marginTop: 8, marginBottom: 8 }}>
+                    <Button type="link" size="small" onClick={() => setForgotMode('forgot')}>
+                      Quên mật khẩu?
+                    </Button>
+                  </div>
+
+                  <Divider plain>hoặc</Divider>
+                  <Button
+                    block
+                    size="large"
+                    icon={<GoogleOutlined />}
+                    onClick={handleGoogleLogin}
+                    id="google-login"
+                  >
+                    Đăng nhập bằng Google
+                  </Button>
+                </form>
+              ),
+            },
+            {
+              key: 'register',
+              label: 'Đăng ký',
+              children: (
+                <form onSubmit={registerForm.handleSubmit(onRegister)}>
+                  <Controller
+                    name="fullName"
+                    control={registerForm.control}
+                    render={({ field, fieldState }) => (
+                      <Form.Item
+                        validateStatus={fieldState.error ? 'error' : undefined}
+                        help={fieldState.error?.message}
+                        style={{ marginBottom: 16 }}
+                      >
+                        <Input
+                          {...field}
+                          prefix={<UserOutlined style={{ color: '#9ca3af' }} />}
+                          placeholder="Họ tên"
+                          size="large"
+                          id="register-fullname"
+                        />
+                      </Form.Item>
+                    )}
+                  />
+                  <Controller
+                    name="email"
+                    control={registerForm.control}
+                    render={({ field, fieldState }) => (
+                      <Form.Item
+                        validateStatus={fieldState.error ? 'error' : undefined}
+                        help={fieldState.error?.message}
+                        style={{ marginBottom: 16 }}
+                      >
+                        <Input
+                          {...field}
+                          prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
+                          placeholder="Email"
+                          size="large"
+                          id="register-email"
+                        />
+                      </Form.Item>
+                    )}
+                  />
+                  <Controller
+                    name="password"
+                    control={registerForm.control}
+                    render={({ field, fieldState }) => (
+                      <Form.Item
+                        validateStatus={fieldState.error ? 'error' : undefined}
+                        help={fieldState.error?.message}
+                        style={{ marginBottom: 16 }}
+                      >
+                        <Input.Password
+                          {...field}
+                          prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
+                          placeholder="Mật khẩu (ít nhất 6 ký tự)"
+                          size="large"
+                          id="register-password"
+                        />
+                      </Form.Item>
+                    )}
+                  />
+                  <Controller
+                    name="confirmPassword"
+                    control={registerForm.control}
+                    render={({ field, fieldState }) => (
+                      <Form.Item
+                        validateStatus={fieldState.error ? 'error' : undefined}
+                        help={fieldState.error?.message}
+                        style={{ marginBottom: 24 }}
+                      >
+                        <Input.Password
+                          {...field}
+                          prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
+                          placeholder="Xác nhận mật khẩu"
+                          size="large"
+                          id="register-confirm-password"
+                        />
+                      </Form.Item>
+                    )}
+                  />
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    block
+                    size="large"
+                    id="register-submit"
+                  >
+                    Đăng ký
+                  </Button>
+                </form>
+              ),
+            },
+          ]}
+        />
       )}
       <DeviceLimitModal
         activeDevices={activeDevices}
         onClose={() => setDeviceLimitOpen(false)}
+        onRevokeEarliest={handleRevokeEarliest}
         open={deviceLimitOpen}
+        revoking={revoking}
       />
     </>
   );

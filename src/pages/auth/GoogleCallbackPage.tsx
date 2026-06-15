@@ -5,6 +5,7 @@ import { authService } from '@/services';
 import { useAuthStore } from '@/store/auth.store';
 import { ADMIN, SUPER_ADMIN } from '@/constants';
 import { getAuthErrorMessage } from '@/utils/auth-error-message';
+import { readOrCreateDeviceUid } from '@/utils/device';
 import DeviceLimitModal from './DeviceLimitModal';
 import { ACCOUNT_IN_USE_CODE, decodeDeviceLimitDetails } from '@/utils/device-limit-error';
 import { useState } from 'react';
@@ -71,6 +72,28 @@ export default function GoogleCallbackPage() {
       });
   }, [searchParams, navigate, setAuth]);
 
+  /**
+   * Revoke the earliest active session by re-initiating Google OAuth login
+   * with the revokeSessionId param. BE will revoke the session during the
+   * callback before checking device limits.
+   * Sessions are sorted by loginAt DESC — the last element is the earliest.
+   */
+  const handleRevokeEarliest = () => {
+    if (activeDevices.length === 0) return;
+    const earliest = activeDevices[activeDevices.length - 1];
+    if (!earliest.sessionId) {
+      message.error('Không thể xác định phiên đăng nhập sớm nhất.');
+      return;
+    }
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+    const deviceUid = readOrCreateDeviceUid();
+    const params = new URLSearchParams({
+      device_uid: deviceUid,
+      revokeSessionId: earliest.sessionId,
+    });
+    window.location.href = `${apiBase}/auth/google?${params.toString()}`;
+  };
+
   return (
     <>
       <div
@@ -86,6 +109,7 @@ export default function GoogleCallbackPage() {
       <DeviceLimitModal
         activeDevices={activeDevices}
         onClose={() => navigate('/auth')}
+        onRevokeEarliest={handleRevokeEarliest}
         open={deviceLimitOpen}
       />
     </>

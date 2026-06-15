@@ -13,6 +13,7 @@ export interface LoginPayload {
   password: string;
   device: CreateDeviceDto;
   force?: boolean;
+  revokeSessionId?: string;
 }
 
 export interface RegisterPayload {
@@ -39,6 +40,7 @@ export interface LoginResponse {
 }
 
 export interface ActiveLoginDevice {
+  sessionId?: string;
   deviceId: string;
   deviceName?: string | null;
   deviceType?: 'mobile' | 'desktop' | string | null;
