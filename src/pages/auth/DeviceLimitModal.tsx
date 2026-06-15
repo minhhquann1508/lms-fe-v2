@@ -3,6 +3,7 @@ import {
   ClockCircleOutlined,
   ExclamationCircleFilled,
   LaptopOutlined,
+  LogoutOutlined,
   MobileOutlined,
 } from '@ant-design/icons';
 import { colors } from '@/config/theme';
@@ -12,6 +13,8 @@ interface DeviceLimitModalProps {
   open: boolean;
   activeDevices: ActiveLoginDevice[];
   onClose: () => void;
+  onRevokeEarliest?: () => void;
+  revoking?: boolean;
 }
 
 function getDeviceIcon(deviceType?: string | null) {
@@ -33,16 +36,40 @@ function formatDate(value?: string | Date | null) {
   }).format(date);
 }
 
-export default function DeviceLimitModal({ open, activeDevices, onClose }: DeviceLimitModalProps) {
+export default function DeviceLimitModal({
+  open,
+  activeDevices,
+  onClose,
+  onRevokeEarliest,
+  revoking = false,
+}: DeviceLimitModalProps) {
+  const hasEarliestSession = activeDevices.length > 0;
+  // Sessions are sorted by loginAt DESC (most recent first); the last item is the earliest.
+  const earliestDevice = hasEarliestSession ? activeDevices[activeDevices.length - 1] : null;
+
   return (
     <Modal
       centered
       className="device-limit-modal"
-      footer={[
-        <Button key="close" type="primary" size="large" onClick={onClose}>
-          Đã hiểu
-        </Button>,
-      ]}
+      footer={
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+          <Button key="close" size="large" onClick={onClose}>
+            Đã hiểu
+          </Button>
+          {onRevokeEarliest && hasEarliestSession && (
+            <Button
+              key="revoke"
+              type="primary"
+              size="large"
+              loading={revoking}
+              icon={<LogoutOutlined />}
+              onClick={onRevokeEarliest}
+            >
+              Đăng xuất phiên cũ &amp; đăng nhập
+            </Button>
+          )}
+        </div>
+      }
       onCancel={onClose}
       open={open}
       title={null}
@@ -114,7 +141,9 @@ export default function DeviceLimitModal({ open, activeDevices, onClose }: Devic
         </div>
 
         <div className="device-limit-modal__hint">
-          Mở thiết bị đang dùng tài khoản này, chọn Đăng xuất, sau đó quay lại đăng nhập tại đây.
+          {onRevokeEarliest && earliestDevice
+            ? `Bạn có thể đăng xuất phiên đăng nhập sớm nhất trên "${earliestDevice.deviceName || 'thiết bị chưa đặt tên'}" để tiếp tục đăng nhập tại đây.`
+            : 'Mở thiết bị đang dùng tài khoản này, chọn Đăng xuất, sau đó quay lại đăng nhập tại đây.'}
         </div>
       </div>
     </Modal>
