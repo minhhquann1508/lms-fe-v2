@@ -4727,7 +4727,7 @@ select,
 
 .lms-auth-brand-tagline {
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: var(--color-textSecondary);
   font-weight: 400;
 }
 
@@ -4752,7 +4752,7 @@ select,
 
 .lms-auth-card__subtitle {
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: var(--color-textSecondary);
   margin: 0 0 24px;
 }
 
@@ -4778,7 +4778,7 @@ select,
 }
 
 .lms-auth-btn-google:hover {
-  border-color: var(--color-border-strong);
+  border-color: var(--color-borderStrong);
   background: var(--color-surface);
 }
 
@@ -4799,7 +4799,7 @@ select,
   align-items: center;
   gap: 16px;
   margin: 20px 0;
-  color: var(--color-text-disabled);
+  color: var(--color-textDisabled);
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
@@ -4829,7 +4829,7 @@ select,
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-text-disabled);
+  color: var(--color-textDisabled);
   background: none;
   border: none;
   cursor: pointer;
@@ -4890,7 +4890,7 @@ select,
 }
 
 .lms-auth-input::placeholder {
-  color: var(--color-text-disabled);
+  color: var(--color-textDisabled);
 }
 
 .lms-auth-input:focus {
@@ -4914,7 +4914,7 @@ select,
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  color: var(--color-text-disabled);
+  color: var(--color-textDisabled);
   pointer-events: none;
 }
 
@@ -4961,7 +4961,7 @@ select,
 }
 
 .lms-auth-btn-primary:disabled {
-  background: var(--color-text-disabled);
+  background: var(--color-textDisabled);
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
@@ -5014,7 +5014,7 @@ select,
 }
 
 .lms-auth-sent__text {
-  color: var(--color-text-secondary);
+  color: var(--color-textSecondary);
   margin: 0 0 16px;
   font-size: 14px;
 }
@@ -5030,7 +5030,7 @@ select,
 }
 
 .lms-auth-forgot__desc {
-  color: var(--color-text-secondary);
+  color: var(--color-textSecondary);
   margin: 0 0 24px;
   text-align: center;
   font-size: 14px;

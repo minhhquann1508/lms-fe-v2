@@ -1,4 +1,4 @@
-import { useState, useMemo, type FormEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -79,12 +79,17 @@ export default function AuthPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { setAuth } = useAuthStore();
 
-  const pendingRevokeSessionId = useMemo(() => searchParams.get('revokeSessionId'), [searchParams]);
-  if (pendingRevokeSessionId && searchParams.has('revokeSessionId')) {
-    const next = new URLSearchParams(searchParams);
-    next.delete('revokeSessionId');
-    setSearchParams(next, { replace: true });
-  }
+  const pendingRevokeSessionId = useRef<string | null>(null);
+
+  useEffect(() => {
+    const revokeId = searchParams.get('revokeSessionId');
+    if (revokeId) {
+      pendingRevokeSessionId.current = revokeId;
+      const next = new URLSearchParams(searchParams);
+      next.delete('revokeSessionId');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   /* ── Login form ── */
   const loginForm = useForm<LoginFormValues>({
@@ -122,7 +127,9 @@ export default function AuthPage() {
   };
 
   const onLogin = (values: LoginFormValues) => {
-    return doLogin(values, pendingRevokeSessionId ?? undefined);
+    const revokeId = pendingRevokeSessionId.current ?? undefined;
+    pendingRevokeSessionId.current = null;
+    return doLogin(values, revokeId);
   };
 
   const handleRevokeEarliest = () => {
@@ -283,6 +290,7 @@ export default function AuthPage() {
 
       {/* Login Form */}
       {activeTab === 'login' && (
+        // eslint-disable-next-line react-hooks/refs
         <form onSubmit={loginForm.handleSubmit(onLogin)}>
           <Controller
             name="email"
