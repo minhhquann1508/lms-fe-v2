@@ -161,7 +161,7 @@ export default function PublicLayout() {
         ) : null}
       </header>
 
-      <Content>
+      <Content style={{ paddingTop: '80px' }}>
         <Outlet />
       </Content>
 
