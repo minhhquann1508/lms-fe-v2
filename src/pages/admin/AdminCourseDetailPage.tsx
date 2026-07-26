@@ -599,10 +599,6 @@ export default function AdminCourseDetailPage() {
             </div>
           </div>
           <div className="lms-admin-block__actions">
-            <span className="lms-admin-badge lms-admin-badge--neutral">
-              {chapters.length} chương
-            </span>
-            <span className="lms-admin-badge lms-admin-badge--neutral">{lectureCount} bài</span>
             <button
               className="lms-admin-btn lms-admin-btn--primary lms-admin-btn--sm"
               onClick={openCreateChapter}
