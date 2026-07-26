@@ -21,7 +21,16 @@ import {
   PlusOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { CourseCard, EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect } from '@/components';
+import {
+  CourseCard,
+  EmptyState,
+  ErrorState,
+  LoadingSkeleton,
+  AdminPageHead,
+  AdminButton,
+  AdminSearchInput,
+  AdminFilterSelect,
+} from '@/components';
 import { courseService, categoryService, uploadService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
 import { useBreakpoint, useDebounce, usePageTitle } from '@/hooks';
@@ -161,11 +170,14 @@ export default function AdminCoursesPage() {
         subtitle="Tạo, cập nhật và kiểm tra trạng thái xuất bản của các khoá học."
       />
 
-      <div className="lms-admin-courses-toolbar">
+      <div className="lms-admin-courses-toolbar mt-4">
         <div className="lms-admin-toolbar-left">
           <AdminSearchInput
             value={search}
-            onChange={(v) => { setSearch(v); setPage(1); }}
+            onChange={(v) => {
+              setSearch(v);
+              setPage(1);
+            }}
             id="course-search-admin"
           />
           <AdminFilterSelect
@@ -355,7 +367,7 @@ export default function AdminCoursesPage() {
         onOk={handleSubmit}
         open={editModalOpen}
         title="Sửa khoá học"
-        width={600}
+        width={720}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 'var(--spacing-4)' }}>
           <Form.Item

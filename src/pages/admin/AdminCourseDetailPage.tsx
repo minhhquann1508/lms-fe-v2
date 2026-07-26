@@ -950,7 +950,7 @@ export default function AdminCourseDetailPage() {
           editingChapter ? 'Cập nhật chương' : 'Tạo chương mới',
           'Tên ngắn, mô tả gọn và trạng thái rõ ràng.',
         )}
-        width={520}
+        width={680}
       >
         <Form form={chapterForm} layout="vertical" style={{ display: 'grid', gap: 18 }}>
           <Form.Item
@@ -1020,7 +1020,7 @@ export default function AdminCourseDetailPage() {
           editingLecture ? 'Cập nhật bài giảng' : 'Tạo bài giảng mới',
           'Thứ tự bài giảng sẽ tự động sắp xếp. Kéo thả sau khi tạo để thay đổi.',
         )}
-        width={640}
+        width={720}
       >
         <Form form={lectureForm} layout="vertical" style={{ display: 'grid', gap: 18 }}>
           <Form.Item

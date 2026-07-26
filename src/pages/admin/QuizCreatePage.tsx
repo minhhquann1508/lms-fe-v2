@@ -387,7 +387,7 @@ export default function QuizCreatePage() {
         onOk={handleQuestionSubmit}
         open={questionModalOpen}
         title={editingQuestionIndex !== null ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}
-        width={640}
+        width={720}
       >
         <Form form={questionForm} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item

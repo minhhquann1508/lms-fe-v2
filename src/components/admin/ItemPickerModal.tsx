@@ -98,7 +98,7 @@ export default function ItemPickerModal({
       open={open}
       onCancel={loading ? undefined : onClose}
       title={title}
-      width={600}
+      width={720}
       footer={
         <div className="lms-picker-modal__footer">
           <span className="lms-picker-modal__count">

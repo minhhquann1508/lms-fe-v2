@@ -4957,34 +4957,42 @@ select,
 
 .lms-admin-modal .ant-modal-content {
   border-radius: var(--radius-xl);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.14), 0 8px 24px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 }
+.lms-admin-modal .ant-modal-content::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, #60a5fa 100%);
+}
 .lms-admin-modal .ant-modal-header {
-  padding: 20px 24px;
+  padding: 20px 28px;
   border-bottom: 1px solid var(--color-hairline-soft);
   margin-bottom: 0;
 }
 .lms-admin-modal .ant-modal-body {
-  padding: 24px;
+  padding: 28px;
 }
 .lms-admin-modal .ant-modal-footer {
-  padding: 16px 24px;
+  padding: 18px 28px;
   border-top: 1px solid var(--color-hairline-soft);
   margin-top: 0;
+  background: var(--color-surface);
 }
 .lms-admin-modal .ant-modal-title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
 }
 .lms-admin-modal .ant-modal-footer .ant-btn {
   height: 42px;
-  padding: 0 20px;
+  padding: 0 22px;
   font-weight: 600;
   border-radius: var(--radius-md);
 }
 .lms-admin-modal .ant-modal-footer .ant-btn-primary {
-  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 .lms-admin-modal .ant-modal-close {
   top: 18px;
@@ -4992,9 +5000,17 @@ select,
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
+  transition: all 200ms ease;
 }
 .lms-admin-modal .ant-modal-close:hover {
   background: var(--color-surface);
+}
+.lms-admin-modal .ant-modal-close .ant-modal-close-x {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  font-size: 16px;
+  color: var(--color-textDisabled);
 }
 .lms-admin-modal .ant-input:focus,
 .lms-admin-modal .ant-input-focused,
@@ -5003,7 +5019,7 @@ select,
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 .lms-admin-modal .ant-form-item {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 .lms-admin-modal .ant-form-item:last-child {
   margin-bottom: 0;

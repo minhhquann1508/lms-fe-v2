@@ -421,7 +421,7 @@ export default function AdminQuizzesPage() {
         open={modalOpen}
         title={editingQuiz ? 'Chỉnh sửa bài kiểm tra' : 'Tạo bài kiểm tra mới'}
         confirmLoading={createMutation.isPending || updateMutation.isPending}
-        width={560}
+        width={680}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
@@ -482,7 +482,7 @@ export default function AdminQuizzesPage() {
         }}
         open={importModalOpen}
         title="Nhập danh sách bài kiểm tra từ Excel"
-        width={600}
+        width={720}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

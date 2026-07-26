@@ -307,7 +307,8 @@ export default function AdminUsersPage() {
         footer={null}
         onCancel={() => setCreateModalOpen(false)}
         open={createModalOpen}
-        title="Tạo người dùng mới"
+        title="Tạo ngưởi dùng mới"
+        width={640}
       >
         <form
           onSubmit={(e) => {
@@ -351,7 +352,8 @@ export default function AdminUsersPage() {
         footer={null}
         onCancel={() => setImportModalOpen(false)}
         open={importModalOpen}
-        title="Import người dùng (CSV)"
+        title="Import ngưởi dùng (CSV)"
+        width={640}
       >
         <div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 12, fontSize: 13 }}>
