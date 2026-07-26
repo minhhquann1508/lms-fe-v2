@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/auth.store';
 import { authService, siteSettingService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
-import { useBreakpoint, useScrollDirection } from '@/hooks';
+import { useBreakpoint } from '@/hooks';
 import { NotificationDropdown } from '@/components';
 
 const { Content } = Layout;
@@ -22,8 +22,8 @@ export default function PublicLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const breakpoint = useBreakpoint();
-  const headerHidden = useScrollDirection();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const { data: freshUser } = useQuery({
     queryKey: queryKeys.auth.me,
@@ -44,6 +44,13 @@ export default function PublicLayout() {
     }
   }, [freshUser, user, setUser]);
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 60);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleLogout = async () => {
     try {
       await authService.logout();
@@ -54,11 +61,9 @@ export default function PublicLayout() {
   };
 
   const navItems = [
-    { label: 'Home', path: '/' },
-    { label: 'Courses', path: '/' },
-    { label: 'My Learning', path: '/profile', protected: true },
-    { label: 'Profile', path: '/profile', protected: true },
-    { label: 'More', path: '#more' },
+    { label: 'Trang chủ', path: '/' },
+    { label: 'Khoá học', path: '/' },
+    { label: 'Khoá học của tôi', path: '/profile', protected: true },
   ];
 
   const userMenuItems = user
@@ -87,9 +92,7 @@ export default function PublicLayout() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <header
-        className={`lms-public-header ${breakpoint === 'mobile' && headerHidden ? 'lms-public-header--hidden' : ''}`}
-      >
+      <header className={`lms-public-header${scrolled ? ' lms-public-header--scrolled' : ''}`}>
         <Link className="lms-brand" to="/">
           {settings?.logoUrl ? (
             <img
@@ -98,10 +101,28 @@ export default function PublicLayout() {
               className="lms-brand__logo"
             />
           ) : (
-            <BookOutlined />
+            <span className="lms-brand__icon">
+              <BookOutlined />
+            </span>
           )}
-          <span>{settings?.footerBrandName ?? 'LMS Platform'}</span>
+          <span className="lms-brand__name">{settings?.footerBrandName ?? 'LMS Platform'}</span>
         </Link>
+
+        <nav className="lms-public-nav">
+          {navItems.map((item) => {
+            const active = item.path !== '#more' && location.pathname === item.path;
+            const target = item.protected && !user ? '/auth' : item.path;
+            return (
+              <Link
+                key={item.label}
+                className={`lms-public-nav__link${active ? ' lms-public-nav__link--active' : ''}`}
+                to={target}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
 
         <div className="lms-public-actions">
           {user ? <NotificationDropdown /> : null}
@@ -122,7 +143,7 @@ export default function PublicLayout() {
               </Space>
             </Dropdown>
           ) : !user ? (
-            <Button type="primary" onClick={() => navigate('/auth')}>
+            <Button className="lms-login-btn" onClick={() => navigate('/auth')}>
               Đăng nhập
             </Button>
           ) : null}
@@ -141,63 +162,38 @@ export default function PublicLayout() {
         ) : null}
       </header>
 
-      <Content className="lms-shell-content">
+      <Content>
         <Outlet />
       </Content>
 
       <footer className="lms-public-footer">
-        <div className="lms-public-footer__inner">
-          <div className="lms-public-footer__brand">
+        <div className="lms-public-footer__brand">
+          <span className="lms-public-footer__icon">
             <BookOutlined />
-            <span>{settings?.footerBrandName ?? 'LMS Platform'}</span>
-          </div>
-          <div className="lms-public-footer__links">
-            {settings?.footerLinks && settings.footerLinks.length > 0 ? (
-              settings.footerLinks.map((link, i) => (
-                <Link key={i} to={link.url}>
-                  {link.label}
-                </Link>
-              ))
-            ) : (
-              <>
-                <Link to="/">Trang chủ</Link>
-                <Link to="/">Khoá học</Link>
-              </>
-            )}
-            {user ? <Link to="/profile">Hồ sơ</Link> : null}
-          </div>
-          <div className="lms-public-footer__copy">
-            {settings?.footerCopyright
-              ? settings.footerCopyright.replace('{year}', String(new Date().getFullYear()))
-              : `© ${new Date().getFullYear()} LMS Platform. All rights reserved.`}
-          </div>
+          </span>
+          <span>{settings?.footerBrandName ?? 'LMS Platform'}</span>
+        </div>
+        <div className="lms-public-footer__links">
+          {settings?.footerLinks && settings.footerLinks.length > 0 ? (
+            settings.footerLinks.map((link, i) => (
+              <Link key={i} to={link.url}>
+                {link.label}
+              </Link>
+            ))
+          ) : (
+            <>
+              <Link to="/">Trang chủ</Link>
+              <Link to="/">Khoá học</Link>
+            </>
+          )}
+          {user ? <Link to="/profile">Hồ sơ</Link> : null}
+        </div>
+        <div className="lms-public-footer__copy">
+          {settings?.footerCopyright
+            ? settings.footerCopyright.replace('{year}', String(new Date().getFullYear()))
+            : `© ${new Date().getFullYear()} LMS Platform. All rights reserved.`}
         </div>
       </footer>
-
-      <nav className="lms-mobile-bottom-nav" aria-label="Điều hướng mobile">
-        {navItems.map((item) => {
-          const active = item.path !== '#more' && location.pathname === item.path;
-          const target = item.protected && !user ? '/auth' : item.path;
-          const handleClick = () => {
-            if (item.path === '#more') {
-              setMoreOpen(true);
-              return;
-            }
-            navigate(target);
-          };
-
-          return (
-            <button
-              className={`lms-mobile-bottom-nav__item ${active ? 'lms-mobile-bottom-nav__item--active' : ''}`}
-              key={item.label}
-              onClick={handleClick}
-              type="button"
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
     </Layout>
   );
 }
