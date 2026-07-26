@@ -227,14 +227,14 @@ export default function AdminCoursesPage() {
           {
             key: 'create',
             node: (
-              <Button
-                icon={<PlusOutlined />}
+              <button
+                className="lms-admin-btn lms-admin-btn--primary"
                 id="create-course"
                 onClick={() => navigate('/admin/courses/create')}
-                type="primary"
               >
+                <PlusOutlined />
                 <span className="lms-btn-text-responsive">Thêm khoá học</span>
-              </Button>
+              </button>
             ),
           },
         ]}
@@ -406,18 +406,18 @@ export default function AdminCoursesPage() {
                       beforeUpload={(file) => handleThumbnailUpload(file as File)}
                       showUploadList={false}
                     >
-                      <Button type="primary" ghost icon={<UploadOutlined />}>
+                      <button className="lms-admin-btn lms-admin-btn--outline lms-admin-btn--sm">
+                        <UploadOutlined />
                         Thay đổi
-                      </Button>
+                      </button>
                     </Upload>
-                    <Button
-                      danger
-                      type="primary"
-                      icon={<UploadOutlined />}
+                    <button
+                      className="lms-admin-btn lms-admin-btn--danger lms-admin-btn--sm"
                       onClick={() => form.setFieldValue('thumbnail', '')}
                     >
+                      <UploadOutlined />
                       Xóa
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ) : (
