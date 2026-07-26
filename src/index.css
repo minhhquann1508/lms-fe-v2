@@ -922,6 +922,12 @@ select,
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
+.lms-admin-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
 .lms-admin-page-head__actions {
   display: flex;

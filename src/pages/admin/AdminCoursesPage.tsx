@@ -21,7 +21,7 @@ import {
   PlusOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { CourseCard, EmptyState, ErrorState, LoadingSkeleton } from '@/components';
+import { CourseCard, EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect } from '@/components';
 import { courseService, categoryService, uploadService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
 import { useBreakpoint, useDebounce, usePageTitle } from '@/hooks';
@@ -156,51 +156,39 @@ export default function AdminCoursesPage() {
 
   return (
     <div>
-      <div className="lms-admin-page-head">
-        <div>
-          <h2 className="lms-admin-page-head__title">Quản lý khoá học</h2>
-          <p className="lms-admin-page-head__subtitle">
-            Tạo, cập nhật và kiểm tra trạng thái xuất bản của các khoá học.
-          </p>
-        </div>
-        <button
-          className="lms-admin-btn lms-admin-btn--primary"
-          id="create-course"
-          onClick={() => navigate('/admin/courses/create')}
-        >
-          <PlusOutlined />
-          <span className="lms-btn-text-responsive">Thêm khoá học</span>
-        </button>
-      </div>
+      <AdminPageHead
+        title="Quản lý khoá học"
+        subtitle="Tạo, cập nhật và kiểm tra trạng thái xuất bản của các khoá học."
+      />
 
       <div className="lms-admin-courses-toolbar">
-        <div className="lms-admin-search">
-          <input
-            type="text"
-            className="lms-admin-search__input"
-            id="course-search-admin"
-            placeholder="Tìm kiếm..."
+        <div className="lms-admin-toolbar-left">
+          <AdminSearchInput
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+            onChange={(v) => { setSearch(v); setPage(1); }}
+            id="course-search-admin"
+          />
+          <AdminFilterSelect
+            value={filterValue}
+            onChange={(v) => {
+              setIsPublishedFilter(v === 'all' ? undefined : v === 'published');
               setPage(1);
             }}
+            options={[
+              { label: 'Tất cả trạng thái', value: 'all' },
+              { label: 'Đã xuất bản', value: 'published' },
+              { label: 'Bản nháp', value: 'draft' },
+            ]}
+            ariaLabel="Lọc trạng thái xuất bản"
           />
         </div>
-        <select
-          className="lms-admin-filter-select"
-          aria-label="Lọc trạng thái xuất bản"
-          value={filterValue}
-          onChange={(e) => {
-            const value = e.target.value;
-            setIsPublishedFilter(value === 'all' ? undefined : value === 'published');
-            setPage(1);
-          }}
+        <AdminButton
+          variant="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate('/admin/courses/create')}
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="published">Đã xuất bản</option>
-          <option value="draft">Bản nháp</option>
-        </select>
+          Thêm khoá học
+        </AdminButton>
       </div>
 
       {isError ? <ErrorState inline onRetry={() => refetch()} /> : null}
