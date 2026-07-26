@@ -8,6 +8,7 @@ import {
   Modal,
   Popconfirm,
   Result,
+  Segmented,
   Spin,
   Tooltip,
   Upload,
@@ -26,8 +27,10 @@ import {
   HolderOutlined,
   InboxOutlined,
   InfoCircleOutlined,
+  LinkOutlined,
   PlayCircleOutlined,
   PlusOutlined,
+  UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
@@ -49,7 +52,7 @@ interface LectureFormValues {
   isPublished?: boolean;
 }
 
-type VideoSourceType = 'upload' | 'url' | 'm3u8';
+type VideoSourceType = 'upload' | 'url';
 
 function formatMinutes(duration = 0) {
   return `${Math.round(duration / 60)} phút`;
@@ -175,7 +178,7 @@ export default function AdminCourseDetailPage() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [dragLectureId, setDragLectureId] = useState<string | null>(null);
   const [openChapterIds, setOpenChapterIds] = useState<Set<string>>(new Set());
-  const [videoSourceType, setVideoSourceType] = useState<VideoSourceType>('upload');
+  const [videoSourceType, setVideoSourceType] = useState<VideoSourceType>('url');
   const [videoUrlInput, setVideoUrlInput] = useState('');
   const [chapterForm] = Form.useForm<ChapterFormValues>();
   const [lectureForm] = Form.useForm<LectureFormValues>();
@@ -297,8 +300,6 @@ export default function AdminCourseDetailPage() {
         formData.append('file', videoFile);
       } else if (videoSourceType === 'url' && videoUrlInput) {
         formData.append('videoUrl', videoUrlInput);
-      } else if (videoSourceType === 'm3u8' && videoUrlInput) {
-        formData.append('m3u8Url', videoUrlInput);
       } else if (videoSourceType === 'upload') {
         throw new Error('LECTURE_FILE_REQUIRED');
       }
@@ -341,8 +342,6 @@ export default function AdminCourseDetailPage() {
         formData.append('file', videoFile);
       } else if (videoSourceType === 'url' && videoUrlInput) {
         formData.append('videoUrl', videoUrlInput);
-      } else if (videoSourceType === 'm3u8' && videoUrlInput) {
-        formData.append('m3u8Url', videoUrlInput);
       }
 
       await lectureService.update(editingLecture.id, formData);
@@ -703,7 +702,7 @@ export default function AdminCourseDetailPage() {
 
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <button
-                        className="lms-admin-btn lms-admin-btn--primary lms-admin-btn--sm"
+                        className="lms-admin-btn lms-admin-btn--outline lms-admin-btn--sm"
                         onClick={() => openCreateLecture(chapter.id)}
                       >
                         <PlusOutlined />
@@ -1115,30 +1114,14 @@ export default function AdminCourseDetailPage() {
             >
               Nguồn video
             </label>
-            <div className="lms-admin-segmented">
-              <button
-                className={`lms-admin-segmented__item${videoSourceType === 'upload' ? ' lms-admin-segmented__item--active' : ''}`}
-                onClick={() => setVideoSourceType('upload')}
-                type="button"
-              >
-                <VideoCameraOutlined style={{ marginRight: 4 }} />
-                Upload
-              </button>
-              <button
-                className={`lms-admin-segmented__item${videoSourceType === 'url' ? ' lms-admin-segmented__item--active' : ''}`}
-                onClick={() => setVideoSourceType('url')}
-                type="button"
-              >
-                URL
-              </button>
-              <button
-                className={`lms-admin-segmented__item${videoSourceType === 'm3u8' ? ' lms-admin-segmented__item--active' : ''}`}
-                onClick={() => setVideoSourceType('m3u8')}
-                type="button"
-              >
-                M3U8
-              </button>
-            </div>
+            <Segmented
+              onChange={(value) => setVideoSourceType(value as VideoSourceType)}
+              options={[
+                { label: 'URL', value: 'url', icon: <LinkOutlined /> },
+                { label: 'Upload', value: 'upload', icon: <UploadOutlined /> },
+              ]}
+              value={videoSourceType}
+            />
           </div>
 
           {videoSourceType === 'upload' ? (
@@ -1191,7 +1174,7 @@ export default function AdminCourseDetailPage() {
                 placeholder={
                   videoSourceType === 'url'
                     ? 'https://example.com/video.mp4'
-                    : 'https://example.com/stream.m3u8'
+                    : 'https://example.com/video.mp4'
                 }
                 size="large"
                 value={videoUrlInput}

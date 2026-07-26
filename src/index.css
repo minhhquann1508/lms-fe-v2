@@ -4565,40 +4565,7 @@ select,
   font-weight: 700;
 }
 
-/* ── Admin: Segmented control ── */
-
-.lms-admin-segmented {
-  display: inline-flex;
-  background: var(--color-surface);
-  border-radius: var(--radius-xs);
-  padding: 3px;
-  border: 1px solid var(--color-border);
-}
-.lms-admin-segmented__item {
-  padding: 7px 14px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-textSecondary);
-  background: transparent;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 200ms ease;
-  white-space: nowrap;
-}
-.lms-admin-segmented__item--active {
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-.lms-admin-segmented__item--disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.lms-admin-segmented__item:not(.lms-admin-segmented__item--disabled):hover {
-  color: var(--color-ink);
-}
+/* ── Admin: Upload zone ── */
 
 .lms-admin-upload-zone {
   border: 2px dashed var(--color-border);
