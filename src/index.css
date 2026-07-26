@@ -4263,6 +4263,100 @@ select,
   }
 }
 
+/* ── Admin: Dashboard ── */
+
+.lms-dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline-soft);
+  border-radius: var(--radius-lg);
+}
+.lms-dashboard-summary__item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+}
+.lms-dashboard-summary__item:nth-child(2) {
+  border-inline: 1px solid var(--color-hairline-soft);
+}
+.lms-dashboard-summary__icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.lms-dashboard-summary__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lms-dashboard-summary__value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.2;
+}
+.lms-dashboard-summary__label {
+  font-size: 13px;
+  color: var(--color-textSecondary);
+  font-weight: 500;
+}
+
+.lms-dashboard-secondary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.lms-dashboard-secondary__card {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline-soft);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.lms-dashboard-secondary__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  font-size: 20px;
+}
+.lms-dashboard-secondary__icon--rating {
+  background: #fef3c7;
+  color: #d97706;
+}
+.lms-dashboard-secondary__icon--reviews {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.lms-dashboard-secondary__icon--discussions {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+.lms-dashboard-secondary__value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.2;
+}
+.lms-dashboard-secondary__label {
+  font-size: 13px;
+  color: var(--color-textSecondary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
 /* ── Admin: Page Header ── */
 
 .lms-admin-page-head {

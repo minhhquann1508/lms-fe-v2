@@ -10,8 +10,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Card, Empty, Table, Tabs, Tag } from 'antd';
-import { ErrorState, LoadingSkeleton, PageHeader, StatCard } from '@/components';
-import { colors } from '@/config/theme';
+import { ErrorState, LoadingSkeleton } from '@/components';
+import { AdminPageHead } from '@/components';
 import { queryKeys } from '@/config/query-keys';
 import { dashboardService } from '@/services';
 import { usePageTitle } from '@/hooks';
@@ -86,45 +86,6 @@ export default function DashboardPage() {
   if (overviewLoading) return <LoadingSkeleton variant="page-content" />;
   if (overviewError) return <ErrorState onRetry={() => refetchOverview()} />;
 
-  const stats = [
-    {
-      title: 'Tổng khoá học',
-      value: overview?.totalCourses ?? 0,
-      icon: <BookOutlined />,
-      color: colors.primary,
-    },
-    {
-      title: 'Đã bán',
-      value: overview?.purchasedCourses ?? 0,
-      icon: <UserOutlined />,
-      color: colors.success,
-    },
-    {
-      title: 'Doanh thu',
-      value: currencyFormatter.format(overview?.revenue ?? 0),
-      icon: <DollarOutlined />,
-      color: colors.warning,
-    },
-    {
-      title: 'Rating TB',
-      value: overview?.averageRating?.toFixed(1) ?? '0',
-      icon: <StarOutlined />,
-      color: colors.info,
-    },
-    {
-      title: 'Tổng review',
-      value: overview?.totalReviews ?? 0,
-      icon: <TrophyOutlined />,
-      color: colors['brand-purple'],
-    },
-    {
-      title: 'Thảo luận',
-      value: overview?.totalDiscussions ?? 0,
-      icon: <CommentOutlined />,
-      color: colors['brand-cyan'],
-    },
-  ];
-
   const leaderboardTabs = [
     {
       key: 'mostStudied',
@@ -160,23 +121,69 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <PageHeader subtitle="Tổng quan hiệu suất khoá học và doanh thu." title="Dashboard" />
-      <div
-        className="lms-grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}
-      >
-        {stats.map((stat) => (
-          <StatCard
-            accentColor={stat.color}
-            icon={stat.icon}
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-          />
-        ))}
+      <AdminPageHead subtitle="Tổng quan hiệu suất khoá học và doanh thu." title="Dashboard" />
+
+      <div className="lms-dashboard-summary" style={{ marginBottom: 20 }}>
+        <div className="lms-dashboard-summary__item">
+          <div className="lms-dashboard-summary__icon">
+            <BookOutlined />
+          </div>
+          <div className="lms-dashboard-summary__body">
+            <span className="lms-dashboard-summary__value">{overview?.totalCourses ?? 0}</span>
+            <span className="lms-dashboard-summary__label">Tổng khoá học</span>
+          </div>
+        </div>
+        <div className="lms-dashboard-summary__item">
+          <div className="lms-dashboard-summary__icon">
+            <UserOutlined />
+          </div>
+          <div className="lms-dashboard-summary__body">
+            <span className="lms-dashboard-summary__value">{overview?.purchasedCourses ?? 0}</span>
+            <span className="lms-dashboard-summary__label">Đã bán</span>
+          </div>
+        </div>
+        <div className="lms-dashboard-summary__item">
+          <div className="lms-dashboard-summary__icon">
+            <DollarOutlined />
+          </div>
+          <div className="lms-dashboard-summary__body">
+            <span className="lms-dashboard-summary__value">{currencyFormatter.format(overview?.revenue ?? 0)}</span>
+            <span className="lms-dashboard-summary__label">Doanh thu</span>
+          </div>
+        </div>
       </div>
 
-      <Card style={{ marginTop: 'var(--spacing-6)' }} title="Leaderboard khoá học">
+      <div className="lms-dashboard-secondary" style={{ marginBottom: 24 }}>
+        <div className="lms-dashboard-secondary__card">
+          <div className="lms-dashboard-secondary__icon lms-dashboard-secondary__icon--rating">
+            <StarOutlined />
+          </div>
+          <div>
+            <div className="lms-dashboard-secondary__value">{overview?.averageRating?.toFixed(1) ?? '0'}</div>
+            <div className="lms-dashboard-secondary__label">Rating TB</div>
+          </div>
+        </div>
+        <div className="lms-dashboard-secondary__card">
+          <div className="lms-dashboard-secondary__icon lms-dashboard-secondary__icon--reviews">
+            <TrophyOutlined />
+          </div>
+          <div>
+            <div className="lms-dashboard-secondary__value">{overview?.totalReviews ?? 0}</div>
+            <div className="lms-dashboard-secondary__label">Tổng review</div>
+          </div>
+        </div>
+        <div className="lms-dashboard-secondary__card">
+          <div className="lms-dashboard-secondary__icon lms-dashboard-secondary__icon--discussions">
+            <CommentOutlined />
+          </div>
+          <div>
+            <div className="lms-dashboard-secondary__value">{overview?.totalDiscussions ?? 0}</div>
+            <div className="lms-dashboard-secondary__label">Thảo luận</div>
+          </div>
+        </div>
+      </div>
+
+      <Card title="Leaderboard khoá học">
         {highlightsLoading ? (
           <LoadingSkeleton count={5} variant="table-row" />
         ) : highlightsError ? (
