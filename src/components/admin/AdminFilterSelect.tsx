@@ -15,6 +15,7 @@ export default function AdminFilterSelect({ value, onChange, options, ariaLabel,
       value={value}
       onChange={(v) => onChange(v as string)}
       options={options}
+      size="large"
       style={{ minWidth: 160, ...style }}
     />
   );
