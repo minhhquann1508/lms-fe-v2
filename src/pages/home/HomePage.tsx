@@ -84,16 +84,12 @@ export default function HomePage() {
           ) : null}
 
           <h1 className="lms-home-hero__title">
-            {(settings?.heroTitle ?? 'Phát triển bản thân mỗi ngày\nvới khoá học chất lượng')
+            {(settings?.heroTitle ?? 'Phát triển bản thân mỗi ngày với khoá học chất lượng')
               .split('\n')
-              .map((line, i, arr) => (
+              .map((line, i) => (
                 <span key={i}>
                   {i > 0 && <br />}
-                  {i === arr.length - 1 && arr.length > 1 ? (
-                    <span className="lms-home-hero__highlight">{line}</span>
-                  ) : (
-                    line
-                  )}
+                  {line}
                 </span>
               ))}
           </h1>

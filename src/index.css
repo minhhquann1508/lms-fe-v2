@@ -4552,13 +4552,6 @@ select,
   color: white;
 }
 
-.lms-home-hero__highlight {
-  background: linear-gradient(135deg, #fb7185, #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .lms-home-hero__desc {
   max-width: 540px;
   font-size: 16px;
