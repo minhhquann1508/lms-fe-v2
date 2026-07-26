@@ -23,7 +23,7 @@ export default function PublicLayout() {
   const location = useLocation();
   const breakpoint = useBreakpoint();
   const [moreOpen, setMoreOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(location.pathname !== '/');
 
   const { data: freshUser } = useQuery({
     queryKey: queryKeys.auth.me,
@@ -44,18 +44,11 @@ export default function PublicLayout() {
     }
   }, [freshUser, user, setUser]);
 
-  const isHome = location.pathname === '/';
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
-    if (!isHome) {
-      setScrolled(true);
-    } else {
-      handleScroll();
-    }
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isHome]);
+  }, []);
 
   const handleLogout = async () => {
     try {

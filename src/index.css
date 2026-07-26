@@ -4752,8 +4752,6 @@ select,
 .lms-course-hero__card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -4764,13 +4762,18 @@ select,
 }
 
 .lms-course-hero__card-img {
-  width: calc(100% + 48px);
-  margin: -25px -25px 0;
+  width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
   display: block;
-  border-radius: 0;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.03), rgba(15, 23, 42, 0.05));
+}
+
+.lms-course-hero__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
 }
 
 .lms-course-hero__price-label {

@@ -196,49 +196,51 @@ export default function CourseDetailPage() {
                   <BookOutlined />
                 </div>
               )}
-              <span className="lms-course-hero__price-label">Học phí</span>
-              <span
-                className={`lms-course-hero__price${course.price > 0 ? '' : ' lms-course-hero__price--free'}`}
-              >
-                {course.price > 0 ? `${course.price.toLocaleString()}đ` : 'Miễn phí'}
-              </span>
-              <p className="lms-course-hero__card-note">
-                Gửi yêu cầu ghi danh. Sau khi được duyệt, hệ thống sẽ mở quyền vào trang học.
-              </p>
+              <div className="lms-course-hero__card-body">
+                <span className="lms-course-hero__price-label">Học phí</span>
+                <span
+                  className={`lms-course-hero__price${course.price > 0 ? '' : ' lms-course-hero__price--free'}`}
+                >
+                  {course.price > 0 ? `${course.price.toLocaleString()}đ` : 'Miễn phí'}
+                </span>
+                <p className="lms-course-hero__card-note">
+                  Gửi yêu cầu ghi danh. Sau khi được duyệt, hệ thống sẽ mở quyền vào trang học.
+                </p>
 
-              {canEnterLearning ? (
-                <button
-                  className="lms-course-hero__btn"
-                  id="enroll-button"
-                  onClick={() => navigate(`/learning/${enrollment!.id}`)}
-                >
-                  Vào học ngay
-                </button>
-              ) : (
-                <button
-                  className="lms-course-hero__btn"
-                  disabled={isPendingApproval || enrollMutation.isPending}
-                  id="enroll-button"
-                  onClick={() => {
-                    if (!user) {
-                      navigate('/auth');
-                      return;
-                    }
-                    enrollMutation.mutate();
-                  }}
-                >
-                  <UserPlusIcon />
-                  {!user
-                    ? 'Đăng nhập để ghi danh'
-                    : isPendingApproval
-                      ? 'Đã đăng ký - đang chờ duyệt'
-                      : enrollment?.status === 'rejected'
-                        ? 'Gửi lại yêu cầu'
-                        : enrollMutation.isPending
-                          ? 'Đang gửi yêu cầu...'
-                          : 'Gửi yêu cầu ghi danh'}
-                </button>
-              )}
+                {canEnterLearning ? (
+                  <button
+                    className="lms-course-hero__btn"
+                    id="enroll-button"
+                    onClick={() => navigate(`/learning/${enrollment!.id}`)}
+                  >
+                    Vào học ngay
+                  </button>
+                ) : (
+                  <button
+                    className="lms-course-hero__btn"
+                    disabled={isPendingApproval || enrollMutation.isPending}
+                    id="enroll-button"
+                    onClick={() => {
+                      if (!user) {
+                        navigate('/auth');
+                        return;
+                      }
+                      enrollMutation.mutate();
+                    }}
+                  >
+                    <UserPlusIcon />
+                    {!user
+                      ? 'Đăng nhập để ghi danh'
+                      : isPendingApproval
+                        ? 'Đã đăng ký - đang chờ duyệt'
+                        : enrollment?.status === 'rejected'
+                          ? 'Gửi lại yêu cầu'
+                          : enrollMutation.isPending
+                            ? 'Đang gửi yêu cầu...'
+                            : 'Gửi yêu cầu ghi danh'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
