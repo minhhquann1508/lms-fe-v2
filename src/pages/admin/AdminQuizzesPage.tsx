@@ -7,6 +7,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  EyeOutlined,
   PlusOutlined,
   UploadOutlined,
   FileExcelOutlined,
@@ -306,9 +307,22 @@ export default function AdminQuizzesPage() {
           courseId?: string | null;
         },
       ) => (
-        <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-          <Link to={`/admin/quizzes/${record.id}/edit`}>
-            <Button icon={<EditOutlined />} size="small" type="text" />
+        <div className="lms-admin-table-actions">
+          <Link
+            className="lms-admin-table-action"
+            to={`/admin/quizzes/${record.id}`}
+            title="Xem chi tiết"
+            aria-label="Xem bài kiểm tra"
+          >
+            <EyeOutlined />
+          </Link>
+          <Link
+            className="lms-admin-table-action"
+            to={`/admin/quizzes/${record.id}/edit`}
+            title="Sửa"
+            aria-label="Sửa bài kiểm tra"
+          >
+            <EditOutlined />
           </Link>
           <Popconfirm
             cancelText="Huỷ"
@@ -317,7 +331,13 @@ export default function AdminQuizzesPage() {
             onConfirm={() => deleteMutation.mutate(record.id)}
             title={`Xoá "${record.title}"?`}
           >
-            <Button danger icon={<DeleteOutlined />} size="small" type="text" />
+            <button
+              className="lms-admin-table-action lms-admin-table-action--danger"
+              title="Xoá"
+              aria-label="Xoá bài kiểm tra"
+            >
+              <DeleteOutlined />
+            </button>
           </Popconfirm>
         </div>
       ),
