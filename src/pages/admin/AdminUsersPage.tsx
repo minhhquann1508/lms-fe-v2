@@ -426,16 +426,20 @@ export default function AdminUsersPage() {
             items: res.items.map((c) => ({
               id: c.id,
               cells: [
-                <span style={{ fontWeight: 600 }}>{c.name}</span>,
-                <span>
-                  {c.isPublished ? (
-                    <span className="lms-admin-badge lms-admin-badge--success">Đã xuất bản</span>
-                  ) : (
-                    <span className="lms-admin-badge lms-admin-badge--draft">Bản nháp</span>
-                  )}
-                </span>,
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 44, height: 30, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: 'var(--color-surface-soft)' }}>
+                    {c.thumbnail ? (
+                      <img src={c.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'var(--color-textDisabled)', fontSize: 14 }}>
+                        <BookOutlined />
+                      </div>
+                    )}
+                  </div>
+                  <span style={{ fontWeight: 600 }}>{c.name}</span>
+                </div>,
               ],
-              cols: 2,
+              cols: 1,
             } as PickerItem)),
             total: res.total,
           };
