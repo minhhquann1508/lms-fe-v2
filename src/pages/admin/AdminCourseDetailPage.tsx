@@ -567,25 +567,6 @@ export default function AdminCourseDetailPage() {
               Cập nhật {formatDate(course.updatedAt)}
             </span>
           </div>
-
-          <div className="lms-admin-hero__meta-row">
-            <div className="lms-admin-hero__meta-item">
-              <div className="lms-admin-hero__meta-val">{chapters.length}</div>
-              <div className="lms-admin-hero__meta-label">Chương</div>
-            </div>
-            <div className="lms-admin-hero__meta-item">
-              <div className="lms-admin-hero__meta-val">{lectureCount}</div>
-              <div className="lms-admin-hero__meta-label">Bài giảng</div>
-            </div>
-            <div className="lms-admin-hero__meta-item">
-              <div className="lms-admin-hero__meta-val">{readyVideos}</div>
-              <div className="lms-admin-hero__meta-label">Video sẵn sàng</div>
-            </div>
-            <div className="lms-admin-hero__meta-item">
-              <div className="lms-admin-hero__meta-val">{formatMinutes(course.duration ?? 0)}</div>
-              <div className="lms-admin-hero__meta-label">Thời lượng</div>
-            </div>
-          </div>
         </div>
       </section>
 
