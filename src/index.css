@@ -4296,8 +4296,8 @@ select,
 }
 
 .lms-learning-sidebar {
-  width: 360px;
-  min-width: 360px;
+  width: 400px;
+  min-width: 400px;
   height: 100vh;
   overflow-y: auto;
   display: flex;
@@ -4310,72 +4310,72 @@ select,
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 20px;
+  padding: 18px 24px;
   border-bottom: 1px solid var(--color-hairline-soft);
   flex-shrink: 0;
 }
 
 .lms-learning-sidebar__logo {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--color-primary), #3b82f6);
   border-radius: 10px;
   color: white;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .lms-learning-sidebar__course {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--color-ink);
 }
 
 .lms-learning-sidebar__hero {
-  padding: 16px 20px;
+  padding: 18px 24px;
   border-bottom: 1px solid var(--color-hairline-soft);
   flex-shrink: 0;
 }
 
 .lms-learning-sidebar__eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-textDisabled);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .lms-learning-sidebar__progress-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .lms-learning-sidebar__progress-label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-textSecondary);
 }
 
 .lms-learning-sidebar__progress-pct {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--color-primary);
 }
 
 .lms-learning-sidebar__progress-bar {
   width: 100%;
-  height: 5px;
-  border-radius: 5px;
+  height: 6px;
+  border-radius: 6px;
   background: var(--color-surface-soft);
   overflow: hidden;
 }
 
 .lms-learning-sidebar__progress-fill {
   height: 100%;
-  border-radius: 5px;
+  border-radius: 6px;
   background: linear-gradient(90deg, var(--color-primary), #3b82f6);
   transition: width 0.3s ease;
 }
@@ -4396,9 +4396,9 @@ select,
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 12px 20px;
+  padding: 14px 24px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-ink-light);
   background: transparent;
@@ -4413,7 +4413,7 @@ select,
 
 .lms-learning-chapter__arrow {
   color: var(--color-textDisabled);
-  font-size: 10px;
+  font-size: 11px;
   transition: transform 200ms ease;
   flex-shrink: 0;
 }
@@ -4433,11 +4433,11 @@ select,
 
 .lms-learning-chapter__count {
   flex-shrink: 0;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
   background: var(--color-surface);
   color: var(--color-textSecondary);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -4455,7 +4455,7 @@ select,
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 9px 20px 9px 44px;
+  padding: 10px 24px 10px 48px;
   font-family: inherit;
   font-size: 13px;
   color: var(--color-ink-light);
@@ -4477,13 +4477,13 @@ select,
 }
 
 .lms-learning-lecture__icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .lms-learning-lecture--done .lms-learning-lecture__icon {
@@ -4499,13 +4499,13 @@ select,
 }
 
 .lms-learning-lecture__dur {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-textDisabled);
   flex-shrink: 0;
 }
 
 .lms-learning-lecture__badge {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   padding: 1px 6px;
   border-radius: var(--radius-full);
