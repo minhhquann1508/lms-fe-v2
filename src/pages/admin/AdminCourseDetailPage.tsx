@@ -359,23 +359,6 @@ export default function AdminCourseDetailPage() {
     onError: () => message.error('Cập nhật bài giảng thất bại'),
   });
 
-  const toggleLecturePublished = useMutation({
-    mutationFn: ({ lecture, isPublished }: { lecture: Lecture; isPublished: boolean }) => {
-      const formData = new FormData();
-      formData.append('name', lecture.name);
-      formData.append('chapterId', lecture.chapterId);
-      formData.append('description', lecture.description ?? '');
-      formData.append('isPublished', String(Boolean(isPublished)));
-      formData.append('order', String(lecture.order));
-      return lectureService.update(lecture.id, formData);
-    },
-    onSuccess: () => {
-      message.success('Đã cập nhật trạng thái bài giảng');
-      refreshCourse();
-    },
-    onError: () => message.error('Không thể cập nhật trạng thái bài giảng'),
-  });
-
   const deleteLecture = useMutation({
     mutationFn: (id: string) => lectureService.delete(id),
     onSuccess: () => {
@@ -554,10 +537,10 @@ export default function AdminCourseDetailPage() {
           </Link>
           <h1 className="lms-admin-page-head__title">{course.name}</h1>
         </div>
-        <button className="lms-admin-btn lms-admin-btn--primary" onClick={openCreateChapter}>
+        {/* <button className="lms-admin-btn lms-admin-btn--primary" onClick={openCreateChapter}>
           <PlusOutlined />
           {breakpoint === 'desktop' ? 'Chương mới' : 'Chương'}
-        </button>
+        </button> */}
       </div>
 
       {/* ── Hero ── */}
@@ -789,17 +772,6 @@ export default function AdminCourseDetailPage() {
                             ) : null}
                           </div>
                         </div>
-
-                        <button
-                          className={`lms-admin-toggle ${lecture.isPublished ? 'lms-admin-toggle--on' : ''}`}
-                          onClick={() =>
-                            toggleLecturePublished.mutate({
-                              lecture,
-                              isPublished: !lecture.isPublished,
-                            })
-                          }
-                          type="button"
-                        />
 
                         <div className="lms-admin-lecture__actions">
                           <Tooltip title={lecture.videoUrl ? 'Xem video' : 'Chưa có video'}>
