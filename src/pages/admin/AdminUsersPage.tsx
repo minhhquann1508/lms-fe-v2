@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Input, Modal, Select, Space, Table, Tag, message } from 'antd';
-import { PlusOutlined, UploadOutlined, UserOutlined, BookOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined, BookOutlined } from '@ant-design/icons';
 import { EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect, ItemPickerModal } from '@/components';
 import { queryKeys } from '@/config/query-keys';
 import { userService, courseService, enrollmentService } from '@/services';
@@ -268,13 +268,6 @@ export default function AdminUsersPage() {
             onClick={() => setUserPickerOpen(true)}
           >
             Thêm vào khoá học
-          </AdminButton>
-          <AdminButton
-            variant="outline-accent"
-            icon={<UploadOutlined />}
-            onClick={() => setImportModalOpen(true)}
-          >
-            Import CSV
           </AdminButton>
           <AdminButton
             variant="primary"

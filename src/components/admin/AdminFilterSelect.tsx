@@ -1,23 +1,22 @@
+import { Select } from 'antd';
+
 interface AdminFilterSelectProps {
   value: string;
   onChange: (value: string) => void;
   options: { label: string; value: string }[];
   ariaLabel?: string;
+  style?: React.CSSProperties;
 }
 
-export default function AdminFilterSelect({ value, onChange, options, ariaLabel }: AdminFilterSelectProps) {
+export default function AdminFilterSelect({ value, onChange, options, ariaLabel, style }: AdminFilterSelectProps) {
   return (
-    <select
-      className="lms-admin-filter-select"
+    <Select
       aria-label={ariaLabel}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
+      onChange={(v) => onChange(v as string)}
+      options={options}
+      size="large"
+      style={{ minWidth: 160, ...style }}
+    />
   );
 }
