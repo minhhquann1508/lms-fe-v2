@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Input, Pagination, Typography } from 'antd';
 import { BookOutlined, SearchOutlined, StarOutlined } from '@ant-design/icons';
 import { CourseCard, EmptyState, ErrorState, LoadingSkeleton } from '@/components';
-import GeometricBg from '@/components/ui/GeometricBg';
+import { GeometricBg } from '@/components';
 import { queryKeys } from '@/config/query-keys';
 import { categoryService, courseService, publicService, siteSettingService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
