@@ -4760,14 +4760,16 @@ select,
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
 .lms-course-hero__card-img {
   width: calc(100% + 48px);
-  margin: -24px -24px 0;
+  margin: -25px -25px 0;
   aspect-ratio: 16/9;
   object-fit: cover;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: block;
+  border-radius: 0;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.03), rgba(15, 23, 42, 0.05));
 }
 
