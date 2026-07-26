@@ -44,12 +44,18 @@ export default function PublicLayout() {
     }
   }, [freshUser, user, setUser]);
 
+  const isHome = location.pathname === '/';
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
-    handleScroll();
+    if (!isHome) {
+      setScrolled(true);
+    } else {
+      handleScroll();
+    }
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHome]);
 
   const handleLogout = async () => {
     try {

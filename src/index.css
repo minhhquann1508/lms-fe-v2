@@ -4867,7 +4867,7 @@ select,
 /* ── Course Detail: Chapters ── */
 
 .lms-course-chapters {
-  padding: 0 0 48px;
+  padding: 40px 0 48px;
 }
 
 .lms-course-chapter-card {
