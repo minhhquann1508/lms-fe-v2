@@ -4919,18 +4919,18 @@ select,
   margin: 0 auto;
 }
 
-.lms-home-cta__title {
+.lms-home-cta__title.ant-typography {
   font-size: 30px;
   font-weight: 700;
   line-height: 1.2;
-  color: white;
+  color: white !important;
   margin: 0 !important;
 }
 
-.lms-home-cta__desc {
+.lms-home-cta__desc.ant-typography {
   font-size: 15px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.8) !important;
   margin: 0 !important;
 }
 
