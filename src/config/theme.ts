@@ -1,14 +1,16 @@
 import { tokens } from './design-tokens';
 
 export const colors = {
-  // Surface
+  primary: tokens.color.primary,
+  'primary-hover': tokens.color['primary-hover'],
+  'primary-light': tokens.color['primary-light'],
+
   canvas: tokens.color.canvas,
   surface: tokens.color.surface,
   'surface-soft': tokens.color['surface-soft'],
   hairline: tokens.color.hairline,
   'hairline-soft': tokens.color['hairline-soft'],
 
-  // Text
   ink: tokens.color.ink,
   'ink-strong': tokens.color['ink-strong'],
   charcoal: tokens.color.charcoal,
@@ -17,19 +19,15 @@ export const colors = {
   stone: tokens.color.stone,
   muted: tokens.color.muted,
 
-  // Semantic
   'success-bg': tokens.color['success-bg'],
   'success-text': tokens.color['success-text'],
 
-  // Semantic aliases for compatibility
-  primary: tokens.color.primary,
   'on-primary': tokens.color['on-primary'],
   success: tokens.color['success-text'],
   info: tokens.color.info,
   warning: tokens.color.warning,
   error: tokens.color.error,
 
-  // Legacy compatibility
   surfaceMuted: tokens.color.surfaceMuted,
   background: tokens.color.background,
   border: tokens.color.border,
@@ -46,10 +44,10 @@ export const colors = {
 export const antdTheme = {
   token: {
     colorPrimary: colors.primary,
-    colorSuccess: colors.success,
+    colorSuccess: colors['success-text'],
     colorWarning: colors.warning,
     colorError: colors.error,
-    colorInfo: colors.primary,
+    colorInfo: colors.info,
     colorBgContainer: colors.canvas,
     colorBgLayout: colors.surface,
     colorBorder: colors.hairline,
@@ -58,11 +56,11 @@ export const antdTheme = {
     borderRadius: Number.parseInt(tokens.radius.md),
     borderRadiusLG: Number.parseInt(tokens.radius.xl),
     borderRadiusSM: Number.parseInt(tokens.radius.sm),
-    fontSize: 16,
-    fontSizeLG: 20,
+    fontSize: 14,
+    fontSizeLG: 16,
     fontSizeSM: 13,
     fontFamily:
-      "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     controlHeight: 40,
     controlHeightLG: 44,
     boxShadow: tokens.shadow.card,
@@ -70,8 +68,8 @@ export const antdTheme = {
   },
   components: {
     Button: {
-      borderRadius: Number.parseInt(tokens.radius.full),
-      borderRadiusSM: Number.parseInt(tokens.radius.full),
+      borderRadius: Number.parseInt(tokens.radius.md),
+      borderRadiusSM: Number.parseInt(tokens.radius.md),
       controlHeight: 40,
       controlHeightLG: 44,
       fontWeight: 600,
@@ -101,11 +99,11 @@ export const antdTheme = {
     },
     Menu: {
       darkItemBg: colors.sidebarBg,
-      darkItemSelectedBg: colors.ink,
-      itemBorderRadius: Number.parseInt(tokens.radius.md),
+      darkItemSelectedBg: tokens.color.ink,
+      itemBorderRadius: Number.parseInt(tokens.radius.lg),
     },
     Table: {
-      borderRadiusLG: Number.parseInt(tokens.radius.md),
+      borderRadiusLG: Number.parseInt(tokens.radius.lg),
     },
     Collapse: {
       borderRadiusLG: Number.parseInt(tokens.radius.lg),
