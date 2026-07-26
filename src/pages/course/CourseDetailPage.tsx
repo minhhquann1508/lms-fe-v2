@@ -251,7 +251,9 @@ export default function CourseDetailPage() {
               src={course.author?.avatar}
             />
             <div>
-              <Text className="lms-course-detail__aside-instructor-label">Giảng viên phụ trách</Text>
+              <Text className="lms-course-detail__aside-instructor-label">
+                Giảng viên phụ trách
+              </Text>
               <div className="lms-course-detail__aside-instructor-name">
                 {course.author?.fullName || 'Đang cập nhật'}
               </div>
@@ -342,7 +344,7 @@ export default function CourseDetailPage() {
                 {!user
                   ? 'Đăng nhập để ghi danh'
                   : isPendingApproval
-                      ? 'Đã đăng ký - đang chờ duyệt'
+                    ? 'Đã đăng ký - đang chờ duyệt'
                     : enrollment?.status === 'rejected'
                       ? 'Gửi lại yêu cầu'
                       : enrollMutation.isPending
@@ -356,7 +358,9 @@ export default function CourseDetailPage() {
 
       {relatedQuery.data?.items ? (
         <section className="lms-course-detail__related">
-          <Title level={3} className="lms-course-detail__related-heading">Khoá học liên quan</Title>
+          <Title level={3} className="lms-course-detail__related-heading">
+            Khoá học liên quan
+          </Title>
           <div className="lms-course-detail__related-grid">
             {relatedQuery.data.items
               .filter((c) => c.id !== course.id)

@@ -17,7 +17,10 @@ export const categoryService = {
     return res.data;
   },
 
-  async update(id: string, data: { name?: string; icon?: string; description?: string }): Promise<Category> {
+  async update(
+    id: string,
+    data: { name?: string; icon?: string; description?: string },
+  ): Promise<Category> {
     const res = (await axios.put(`/categories/${id}`, data)) as unknown as ApiEnvelope<Category>;
     return res.data;
   },

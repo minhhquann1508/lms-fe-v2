@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Avatar, Button, Card, Pagination, Segmented, Space, Tag, Typography, message, Input } from 'antd';
+import {
+  Avatar,
+  Button,
+  Card,
+  Pagination,
+  Segmented,
+  Space,
+  Tag,
+  Typography,
+  message,
+  Input,
+} from 'antd';
 import { BookOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/components';
 import { queryKeys } from '@/config/query-keys';
@@ -32,7 +43,7 @@ function formatDate(value?: string) {
 
 export default function AdminEnrollmentsPage() {
   usePageTitle('Quản lý ghi danh | Admin');
-  
+
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -88,7 +99,16 @@ export default function AdminEnrollmentsPage() {
       />
 
       <Card className="lms-admin-enrollments__workspace" bordered={false}>
-        <div className="lms-admin-enrollments__toolbar" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '24px', justifyContent: 'space-between' }}>
+        <div
+          className="lms-admin-enrollments__toolbar"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '16px',
+            marginBottom: '24px',
+            justifyContent: 'space-between',
+          }}
+        >
           <Segmented
             options={[
               { label: 'Chờ duyệt', value: 'pending' },
@@ -115,7 +135,7 @@ export default function AdminEnrollmentsPage() {
         </div>
 
         {enrollmentsQuery.isLoading ? <LoadingSkeleton count={3} variant="card" /> : null}
-        
+
         {enrollmentsQuery.isError ? (
           <ErrorState onRetry={() => enrollmentsQuery.refetch()} />
         ) : null}
@@ -129,18 +149,48 @@ export default function AdminEnrollmentsPage() {
 
         {!enrollmentsQuery.isLoading && !enrollmentsQuery.isError && enrollments.length ? (
           <>
-            <div className="lms-admin-course-detail__approval-list" style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
+            <div
+              className="lms-admin-course-detail__approval-list"
+              style={{
+                display: 'grid',
+                gap: '16px',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+              }}
+            >
               {enrollments.map((enrollment: Enrollment) => (
-                <article key={enrollment.id} className="lms-admin-course-detail__approval-card" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-5)' }}>
-                  <div className="lms-admin-course-detail__approval-head" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                    <div className="lms-admin-course-detail__approval-user" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <article
+                  key={enrollment.id}
+                  className="lms-admin-course-detail__approval-card"
+                  style={{
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: 'var(--spacing-5)',
+                  }}
+                >
+                  <div
+                    className="lms-admin-course-detail__approval-head"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    <div
+                      className="lms-admin-course-detail__approval-user"
+                      style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
+                    >
                       <Avatar
                         icon={!enrollment.user?.avatar ? <UserOutlined /> : undefined}
                         src={enrollment.user?.avatar ?? undefined}
                         size={40}
                       />
                       <div>
-                        <div className="lms-admin-course-detail__approval-name" style={{ fontWeight: 600 }}>
+                        <div
+                          className="lms-admin-course-detail__approval-name"
+                          style={{ fontWeight: 600 }}
+                        >
                           {enrollment.user?.fullName || enrollment.fullName || 'Học viên'}
                         </div>
                         <Text type="secondary" style={{ fontSize: '13px' }}>
@@ -165,15 +215,32 @@ export default function AdminEnrollmentsPage() {
                           : 'Chờ duyệt'}
                     </Tag>
                   </div>
-                  
-                  <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+                  <div
+                    style={{
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
                     <BookOutlined style={{ color: 'var(--text-tertiary)' }} />
                     <Text strong ellipsis style={{ flex: 1, margin: 0 }}>
                       {enrollment.course?.name || 'Khoá học'}
                     </Text>
                   </div>
 
-                  <div className="lms-admin-course-detail__approval-meta" style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                  <div
+                    className="lms-admin-course-detail__approval-meta"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '16px',
+                    }}
+                  >
                     <span>Gửi lúc {formatDate(enrollment.createdAt)}</span>
                     {enrollment.approvedAt ? (
                       <span>Duyệt lúc {formatDate(enrollment.approvedAt)}</span>
@@ -181,18 +248,40 @@ export default function AdminEnrollmentsPage() {
                   </div>
 
                   {enrollment.notes ? (
-                    <Paragraph className="lms-admin-course-detail__approval-note" style={{ background: 'var(--bg-subtle)', padding: '12px', borderRadius: 'var(--radius-md)', fontSize: '14px', marginBottom: '16px' }}>
+                    <Paragraph
+                      className="lms-admin-course-detail__approval-note"
+                      style={{
+                        background: 'var(--bg-subtle)',
+                        padding: '12px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '14px',
+                        marginBottom: '16px',
+                      }}
+                    >
                       {enrollment.notes}
                     </Paragraph>
                   ) : null}
 
                   {enrollment.reviewNote ? (
-                    <Paragraph className="lms-admin-course-detail__approval-note lms-admin-course-detail__approval-note--muted" style={{ fontSize: '13px', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '16px' }}>
+                    <Paragraph
+                      className="lms-admin-course-detail__approval-note lms-admin-course-detail__approval-note--muted"
+                      style={{
+                        fontSize: '13px',
+                        color: 'var(--text-secondary)',
+                        fontStyle: 'italic',
+                        marginBottom: '16px',
+                      }}
+                    >
                       Phản hồi trước đó: {enrollment.reviewNote}
                     </Paragraph>
                   ) : null}
 
-                  <Space className="lms-admin-course-detail__approval-actions" size={8} wrap style={{ marginTop: 'auto', paddingTop: '8px' }}>
+                  <Space
+                    className="lms-admin-course-detail__approval-actions"
+                    size={8}
+                    wrap
+                    style={{ marginTop: 'auto', paddingTop: '8px' }}
+                  >
                     <Button
                       disabled={enrollment.status !== 'pending'}
                       loading={

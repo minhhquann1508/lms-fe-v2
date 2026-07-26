@@ -92,7 +92,11 @@ export default function PublicLayout() {
       >
         <Link className="lms-brand" to="/">
           {settings?.logoUrl ? (
-            <img src={settings.logoUrl} alt={settings.logoAlt ?? 'Logo'} className="lms-brand__logo" />
+            <img
+              src={settings.logoUrl}
+              alt={settings.logoAlt ?? 'Logo'}
+              className="lms-brand__logo"
+            />
           ) : (
             <BookOutlined />
           )}
@@ -148,18 +152,18 @@ export default function PublicLayout() {
             <span>{settings?.footerBrandName ?? 'LMS Platform'}</span>
           </div>
           <div className="lms-public-footer__links">
-            {settings?.footerLinks && settings.footerLinks.length > 0
-              ? settings.footerLinks.map((link, i) => (
-                  <Link key={i} to={link.url}>
-                    {link.label}
-                  </Link>
-                ))
-              : (
-                <>
-                  <Link to="/">Trang chủ</Link>
-                  <Link to="/">Khoá học</Link>
-                </>
-              )}
+            {settings?.footerLinks && settings.footerLinks.length > 0 ? (
+              settings.footerLinks.map((link, i) => (
+                <Link key={i} to={link.url}>
+                  {link.label}
+                </Link>
+              ))
+            ) : (
+              <>
+                <Link to="/">Trang chủ</Link>
+                <Link to="/">Khoá học</Link>
+              </>
+            )}
             {user ? <Link to="/profile">Hồ sơ</Link> : null}
           </div>
           <div className="lms-public-footer__copy">

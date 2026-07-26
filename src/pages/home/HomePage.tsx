@@ -16,17 +16,17 @@ import {
 } from '@ant-design/icons';
 import { CourseCard, EmptyState, ErrorState, LoadingSkeleton } from '@/components';
 import { queryKeys } from '@/config/query-keys';
-import { categoryService, courseService, publicService } from '@/services';
+import { categoryService, courseService, publicService, siteSettingService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
 
 const { Title, Paragraph } = Typography;
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  'code': <CodeOutlined />,
-  'design': <RocketOutlined />,
-  'business': <ShoppingCartOutlined />,
-  'language': <GlobalOutlined />,
-  'music': <TrophyOutlined />,
+  code: <CodeOutlined />,
+  design: <RocketOutlined />,
+  business: <ShoppingCartOutlined />,
+  language: <GlobalOutlined />,
+  music: <TrophyOutlined />,
 };
 
 export default function HomePage() {
@@ -44,13 +44,24 @@ export default function HomePage() {
     staleTime: 300_000,
   });
 
+  const { data: settings } = useQuery({
+    queryKey: queryKeys.siteSettings.all,
+    queryFn: () => siteSettingService.get(),
+    staleTime: 300_000,
+  });
+
   const categoriesQuery = useQuery({
     queryKey: queryKeys.categories.all,
     queryFn: () => categoryService.getAll(),
   });
 
   const featuredQuery = useQuery({
-    queryKey: queryKeys.courses.list({ limit: 6, sortBy: 'rating', sortOrder: 'DESC', isPublished: true }),
+    queryKey: queryKeys.courses.list({
+      limit: 6,
+      sortBy: 'rating',
+      sortOrder: 'DESC',
+      isPublished: true,
+    }),
     queryFn: () =>
       courseService.getAll({
         limit: 6,
@@ -88,15 +99,35 @@ export default function HomePage() {
         <div className="lms-home-hero__bg" />
         <div className="lms-home-hero__inner">
           <div className="lms-home-hero__content">
-            <span className="lms-home-hero__badge">Nền tảng học tập số 1 Việt Nam</span>
-            <Title level={1} className="lms-home-hero__title">
-              Phát triển bản thân mỗi ngày<br />
-              với <span className="lms-home-hero__highlight">khoá học chất lượng</span>
-            </Title>
-            <Paragraph className="lms-home-hero__desc">
-              Hàng trăm khoá học online từ cơ bản đến nâng cao, giúp bạn thành thạo kỹ năng
-              mới một cách nhanh chóng và hiệu quả.
-            </Paragraph>
+            {settings?.heroSubtitle ? (
+              <span className="lms-home-hero__badge">{settings.heroSubtitle}</span>
+            ) : null}
+            {settings?.heroTitle ? (
+              <Title level={1} className="lms-home-hero__title">
+                {settings.heroTitle.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
+              </Title>
+            ) : (
+              <Title level={1} className="lms-home-hero__title">
+                Phát triển bản thân mỗi ngày
+                <br />
+                với <span className="lms-home-hero__highlight">khoá học chất lượng</span>
+              </Title>
+            )}
+            {settings?.heroDescription ? (
+              <Paragraph className="lms-home-hero__desc">
+                {settings.heroDescription.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {i > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
+              </Paragraph>
+            ) : null}
             <Input
               allowClear
               className="lms-home-hero__search"
@@ -109,29 +140,31 @@ export default function HomePage() {
               size="large"
               value={search}
             />
-            <div className="lms-home-hero__stats">
-              <div className="lms-home-hero__stat">
-                <BookOutlined />
-                <div>
-                  <strong>{stats.totalCourses}</strong>
-                  <span>Khoá học</span>
+            {settings?.heroShowStats !== false ? (
+              <div className="lms-home-hero__stats">
+                <div className="lms-home-hero__stat">
+                  <BookOutlined />
+                  <div>
+                    <strong>{stats.totalCourses}</strong>
+                    <span>Khoá học</span>
+                  </div>
+                </div>
+                <div className="lms-home-hero__stat">
+                  <TeamOutlined />
+                  <div>
+                    <strong>{stats.totalStudents}</strong>
+                    <span>Học viên</span>
+                  </div>
+                </div>
+                <div className="lms-home-hero__stat">
+                  <StarOutlined />
+                  <div>
+                    <strong>{stats.averageRating}</strong>
+                    <span>Đánh giá</span>
+                  </div>
                 </div>
               </div>
-              <div className="lms-home-hero__stat">
-                <TeamOutlined />
-                <div>
-                  <strong>{stats.totalStudents}</strong>
-                  <span>Học viên</span>
-                </div>
-              </div>
-              <div className="lms-home-hero__stat">
-                <StarOutlined />
-                <div>
-                  <strong>{stats.averageRating}</strong>
-                  <span>Đánh giá</span>
-                </div>
-              </div>
-            </div>
+            ) : null}
           </div>
           <div className="lms-home-hero__visual">
             <div className="lms-home-hero__shape lms-home-hero__shape--1" />
@@ -281,14 +314,21 @@ export default function HomePage() {
       <section className="lms-home-cta">
         <div className="lms-home-cta__bg" />
         <div className="lms-home-cta__inner">
-          <Title level={2} className="lms-home-cta__title">
-            Sẵn sàng bắt đầu hành trình học tập?
-          </Title>
-          <Paragraph className="lms-home-cta__desc">
-            Tham gia cùng hàng ngàn học viên đang nâng cao kỹ năng mỗi ngày.
-            <br />
-            Tất cả hoàn toàn miễn phí — không rủi ro, không cam kết.
-          </Paragraph>
+          {settings?.ctaTitle ? (
+            <Title level={2} className="lms-home-cta__title">
+              {settings.ctaTitle}
+            </Title>
+          ) : null}
+          {settings?.ctaDescription ? (
+            <Paragraph className="lms-home-cta__desc">
+              {settings.ctaDescription.split('\n').map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
+            </Paragraph>
+          ) : null}
           <Button
             className="lms-home-cta__btn"
             icon={<RocketOutlined />}
@@ -296,7 +336,7 @@ export default function HomePage() {
             size="large"
             type="primary"
           >
-            Khám phá ngay
+            {settings?.ctaButtonText ?? 'Khám phá ngay'}
           </Button>
         </div>
       </section>

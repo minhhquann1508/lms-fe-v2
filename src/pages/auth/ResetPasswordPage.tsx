@@ -57,7 +57,9 @@ export default function ResetPasswordPage() {
     <div style={{ maxWidth: 400, margin: '0 auto', padding: '48px 24px' }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <LockOutlined style={{ fontSize: 40, color: '#1677ff', marginBottom: 12 }} />
-        <Title level={3} style={{ marginBottom: 4 }}>Đặt lại mật khẩu</Title>
+        <Title level={3} style={{ marginBottom: 4 }}>
+          Đặt lại mật khẩu
+        </Title>
         <Text type="secondary">Nhập mật khẩu mới cho tài khoản {email}</Text>
       </div>
 
@@ -76,9 +78,7 @@ export default function ResetPasswordPage() {
         <Form.Item
           name="confirmPassword"
           label="Xác nhận mật khẩu"
-          rules={[
-            { required: true, message: 'Vui lòng xác nhận mật khẩu' },
-          ]}
+          rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu' }]}
         >
           <Input.Password size="large" placeholder="Xác nhận mật khẩu" />
         </Form.Item>

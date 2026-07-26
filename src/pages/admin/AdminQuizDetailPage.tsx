@@ -206,7 +206,9 @@ export default function AdminQuizDetailPage() {
       >
         {fullQuestions.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <QuestionCircleOutlined style={{ fontSize: 48, color: colors.steel, marginBottom: 16 }} />
+            <QuestionCircleOutlined
+              style={{ fontSize: 48, color: colors.steel, marginBottom: 16 }}
+            />
             <Paragraph type="secondary">Bài kiểm tra chưa có câu hỏi nào.</Paragraph>
           </div>
         ) : (

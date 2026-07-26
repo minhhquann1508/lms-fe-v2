@@ -1,7 +1,16 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Button, Card, Progress, Radio, Result, Spin, Typography, message as antMessage } from 'antd';
+import {
+  Button,
+  Card,
+  Progress,
+  Radio,
+  Result,
+  Spin,
+  Typography,
+  message as antMessage,
+} from 'antd';
 import {
   ClockCircleOutlined,
   LeftOutlined,
@@ -32,9 +41,7 @@ interface ResultDetails {
 }
 
 function transformQuizData(quiz: Quiz): FlatQuestion[] {
-  const sortedQuestions = (quiz.questions ?? [])
-    .slice()
-    .sort((a, b) => a.order - b.order);
+  const sortedQuestions = (quiz.questions ?? []).slice().sort((a, b) => a.order - b.order);
   return sortedQuestions.map((q, idx) => ({
     id: q.id,
     number: idx + 1,
@@ -105,9 +112,7 @@ function ResultScreen({
   const navigate = useNavigate();
   const { attempt, questions, correctMap } = result;
   const totalQuestions = questions.length;
-  const correctCount = attempt.answers.filter(
-    (a) => a.isCorrect === true,
-  ).length;
+  const correctCount = attempt.answers.filter((a) => a.isCorrect === true).length;
 
   return (
     <div className="lms-quiz-result">
@@ -125,17 +130,30 @@ function ResultScreen({
             : 'Bài kiểm tra chưa đạt yêu cầu'}
         </Title>
         <div className="lms-quiz-result__score">
-          <Text style={{ fontSize: 48, fontWeight: 700, color: attempt.scorePercentage !== null && attempt.scorePercentage >= 50 ? '#52c41a' : '#ff4d4f' }}>
+          <Text
+            style={{
+              fontSize: 48,
+              fontWeight: 700,
+              color:
+                attempt.scorePercentage !== null && attempt.scorePercentage >= 50
+                  ? '#52c41a'
+                  : '#ff4d4f',
+            }}
+          >
             {attempt.scorePercentage !== null ? `${attempt.scorePercentage}%` : '--'}
           </Text>
         </div>
         <div className="lms-quiz-result__stats">
           <div className="lms-quiz-result__stat">
-            <Text className="lms-quiz-result__stat-value">{correctCount}/{totalQuestions}</Text>
+            <Text className="lms-quiz-result__stat-value">
+              {correctCount}/{totalQuestions}
+            </Text>
             <Text className="lms-quiz-result__stat-label">Câu đúng</Text>
           </div>
           <div className="lms-quiz-result__stat">
-            <Text className="lms-quiz-result__stat-value">{attempt.score}/{attempt.totalPoints}</Text>
+            <Text className="lms-quiz-result__stat-value">
+              {attempt.score}/{attempt.totalPoints}
+            </Text>
             <Text className="lms-quiz-result__stat-label">Điểm</Text>
           </div>
           <div className="lms-quiz-result__stat">
@@ -183,7 +201,9 @@ function ResultScreen({
                       >
                         {opt.label}. {opt.text}
                         {isRight && <CheckCircleOutlined style={{ marginLeft: 8 }} />}
-                        {isSelected && !isRight && <CloseCircleOutlined style={{ marginLeft: 8 }} />}
+                        {isSelected && !isRight && (
+                          <CloseCircleOutlined style={{ marginLeft: 8 }} />
+                        )}
                       </div>
                     );
                   })}
@@ -215,7 +235,11 @@ export default function QuizPage() {
   const [result, setResult] = useState<ResultDetails | null>(null);
   const [totalSeconds, setTotalSeconds] = useState(0);
 
-  const { data: apiQuiz, isLoading, isError } = useQuery({
+  const {
+    data: apiQuiz,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: queryKeys.quizzes.detail(quizId!),
     queryFn: () => quizService.getById(quizId!),
     enabled: !!quizId,
@@ -338,12 +362,7 @@ export default function QuizPage() {
   }
 
   if (result) {
-    return (
-      <ResultScreen
-        result={result}
-        durationMinutes={durationMinutes}
-      />
-    );
+    return <ResultScreen result={result} durationMinutes={durationMinutes} />;
   }
 
   if (!currentQuestion) {
@@ -369,7 +388,9 @@ export default function QuizPage() {
           {durationMinutes > 0 ? (
             <div className="lms-quiz__timer">
               <ClockCircleOutlined />
-              <span className={`lms-quiz__timer-value ${totalSeconds < 120 ? 'lms-quiz__timer-value--warning' : ''}`}>
+              <span
+                className={`lms-quiz__timer-value ${totalSeconds < 120 ? 'lms-quiz__timer-value--warning' : ''}`}
+              >
                 {formatTime(totalSeconds)}
               </span>
             </div>
@@ -380,12 +401,8 @@ export default function QuizPage() {
       <div className="lms-quiz__layout">
         <div className="lms-quiz__main">
           <Card className="lms-quiz__question-card">
-            <div className="lms-quiz__question-number">
-              Câu {currentQuestion.number}
-            </div>
-            <Paragraph className="lms-quiz__question-text">
-              {currentQuestion.text}
-            </Paragraph>
+            <div className="lms-quiz__question-number">Câu {currentQuestion.number}</div>
+            <Paragraph className="lms-quiz__question-text">{currentQuestion.text}</Paragraph>
 
             <Radio.Group
               className="lms-quiz__options"
@@ -412,12 +429,7 @@ export default function QuizPage() {
                 Câu trước
               </Button>
               {currentIndex < questions.length - 1 ? (
-                <Button
-                  icon={<RightOutlined />}
-                  onClick={handleNext}
-                  size="large"
-                  type="primary"
-                >
+                <Button icon={<RightOutlined />} onClick={handleNext} size="large" type="primary">
                   Câu sau
                 </Button>
               ) : (
@@ -440,7 +452,10 @@ export default function QuizPage() {
           <Card className="lms-quiz__sidebar-card" title="Điều hướng">
             <div className="lms-quiz__sidebar-progress">
               <Text type="secondary">
-                Đã trả lời: <strong>{answeredCount}/{questions.length}</strong>
+                Đã trả lời:{' '}
+                <strong>
+                  {answeredCount}/{questions.length}
+                </strong>
               </Text>
               <Progress
                 percent={Math.round((answeredCount / questions.length) * 100)}

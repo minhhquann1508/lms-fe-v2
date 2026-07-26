@@ -540,9 +540,7 @@ export default function LearningPage() {
 
   const lectureQuiz = quizId ? lectureQuizQuery.data : null;
   const courseQuizzes = courseQuizzesQuery.data?.items ?? [];
-  const latestAttempt = myAttemptsQuery.data?.find(
-    (a) => a.status === 'completed',
-  );
+  const latestAttempt = myAttemptsQuery.data?.find((a) => a.status === 'completed');
 
   const currentLectureNotes = useMemo(
     () =>
@@ -1338,13 +1336,25 @@ export default function LearningPage() {
         <Title className="lms-learning-sidebar__course" level={5}>
           {enrollment.course?.name}
         </Title>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+          }}
+        >
           <Text type="secondary" style={{ fontSize: 12 }}>
             {completedLectureCount}/{totalLectures} bài
           </Text>
           <Text style={{ fontSize: 12, fontWeight: 700 }}>{overallProgress}%</Text>
         </div>
-        <Progress percent={overallProgress} size="small" strokeColor={colors.primary} showInfo={false} />
+        <Progress
+          percent={overallProgress}
+          size="small"
+          strokeColor={colors.primary}
+          showInfo={false}
+        />
       </div>
 
       <div className="lms-learning-sidebar__chapters">
@@ -1357,20 +1367,41 @@ export default function LearningPage() {
             return {
               key: chapter.id,
               label: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', paddingRight: 4, minWidth: 0 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    width: '100%',
+                    paddingRight: 4,
+                    minWidth: 0,
+                  }}
+                >
                   <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                    <div style={{
-                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden', fontSize: 13, fontWeight: 600, lineHeight: 1.3,
-                    }}>
-                      <span style={{ color: 'rgb(100 116 139)', marginRight: 6 }}>Chương {chIndex + 1}:</span>
+                    <div
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      <span style={{ color: 'rgb(100 116 139)', marginRight: 6 }}>
+                        Chương {chIndex + 1}:
+                      </span>
                       {chapter.name}
                     </div>
                     <Text type="secondary" style={{ fontSize: 11, marginTop: 2, display: 'block' }}>
                       {chapterProgress?.completed ?? 0}/{chapterProgress?.total ?? 0} bài
                     </Text>
                   </div>
-                  <Tag color="blue" style={{ fontSize: 11, lineHeight: '18px', padding: '0 6px', flexShrink: 0 }}>
+                  <Tag
+                    color="blue"
+                    style={{ fontSize: 11, lineHeight: '18px', padding: '0 6px', flexShrink: 0 }}
+                  >
                     {chapter.lectures.length}
                   </Tag>
                 </div>
@@ -1381,42 +1412,99 @@ export default function LearningPage() {
                     const progress = progressMap.get(lecture.id);
                     const isActive = lecture.id === currentLecture?.id;
                     const isDone = progress?.isCompleted;
-                    const watchedPercent = lecture.duration > 0 ? Math.min(100, Math.round(((progress?.watchedSeconds ?? 0) / lecture.duration) * 100)) : isDone ? 100 : 0;
+                    const watchedPercent =
+                      lecture.duration > 0
+                        ? Math.min(
+                            100,
+                            Math.round(((progress?.watchedSeconds ?? 0) / lecture.duration) * 100),
+                          )
+                        : isDone
+                          ? 100
+                          : 0;
                     return (
                       <button
                         key={lecture.id}
                         onClick={() => selectLecture(lecture.id)}
                         type="button"
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          padding: '8px 10px', borderRadius: 8,
-                          border: 'none', background: isActive ? 'rgb(219 234 254 / 0.6)' : 'transparent',
-                          color: 'inherit', textAlign: 'left', cursor: 'pointer', width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '8px 10px',
+                          borderRadius: 8,
+                          border: 'none',
+                          background: isActive ? 'rgb(219 234 254 / 0.6)' : 'transparent',
+                          color: 'inherit',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          width: '100%',
                           transition: 'background 0.15s',
                         }}
-                        onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = 'rgb(241 245 249)'; }}
-                        onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+                        onMouseEnter={(e) => {
+                          if (!isActive) e.currentTarget.style.background = 'rgb(241 245 249)';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isActive) e.currentTarget.style.background = 'transparent';
+                        }}
                       >
-                        <span style={{ flexShrink: 0, fontSize: 14, color: isDone ? colors.success : colors.primary }}>
+                        <span
+                          style={{
+                            flexShrink: 0,
+                            fontSize: 14,
+                            color: isDone ? colors.success : colors.primary,
+                          }}
+                        >
                           {isDone ? <CheckCircleFilled /> : <PlayCircleOutlined />}
                         </span>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <Text style={{ fontSize: 13, fontWeight: isActive ? 700 : 500 }} ellipsis={{ tooltip: lecture.name }}>
+                          <Text
+                            style={{ fontSize: 13, fontWeight: isActive ? 700 : 500 }}
+                            ellipsis={{ tooltip: lecture.name }}
+                          >
                             {lecture.name}
                           </Text>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                            <Text type="secondary" style={{ fontSize: 11 }}>{formatDurationLabel(lecture.duration)}</Text>
+                          <div
+                            style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}
+                          >
+                            <Text type="secondary" style={{ fontSize: 11 }}>
+                              {formatDurationLabel(lecture.duration)}
+                            </Text>
                             {lecture.quizId && (
-                              <Tag color="purple" style={{ fontSize: 10, lineHeight: '14px', padding: '0 4px', margin: 0 }}>
+                              <Tag
+                                color="purple"
+                                style={{
+                                  fontSize: 10,
+                                  lineHeight: '14px',
+                                  padding: '0 4px',
+                                  margin: 0,
+                                }}
+                              >
                                 Quiz
                               </Tag>
                             )}
-                            <span style={{
-                              fontSize: 10, fontWeight: 600, padding: '0 6px', borderRadius: 4,
-                              background: isDone ? 'rgb(220 252 231)' : progress?.watchedSeconds ? 'rgb(219 234 254)' : 'rgb(241 245 249)',
-                              color: isDone ? 'rgb(22 101 52)' : progress?.watchedSeconds ? 'rgb(30 64 175)' : 'rgb(71 85 105)',
-                            }}>
-                              {isDone ? 'Xong' : progress?.watchedSeconds ? `${watchedPercent}%` : 'Mới'}
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 600,
+                                padding: '0 6px',
+                                borderRadius: 4,
+                                background: isDone
+                                  ? 'rgb(220 252 231)'
+                                  : progress?.watchedSeconds
+                                    ? 'rgb(219 234 254)'
+                                    : 'rgb(241 245 249)',
+                                color: isDone
+                                  ? 'rgb(22 101 52)'
+                                  : progress?.watchedSeconds
+                                    ? 'rgb(30 64 175)'
+                                    : 'rgb(71 85 105)',
+                              }}
+                            >
+                              {isDone
+                                ? 'Xong'
+                                : progress?.watchedSeconds
+                                  ? `${watchedPercent}%`
+                                  : 'Mới'}
                             </span>
                           </div>
                         </div>
@@ -1438,8 +1526,6 @@ export default function LearningPage() {
       label: 'Tổng quan',
       children: (
         <div className="lms-learning-tabpanel">
-
-
           <Card className="lms-learning-card" title="Mô tả bài học" variant="borderless">
             {currentLecture?.description ? (
               <Paragraph className="lms-learning-description">
@@ -1590,44 +1676,100 @@ export default function LearningPage() {
           ) : (
             <>
               {lectureQuiz && (
-                <Card className="lms-learning-card" variant="borderless" style={{ marginBottom: 16 }}>
-                  <Tag color="purple" style={{ marginBottom: 8 }}>Bài kiểm tra bài học</Tag>
+                <Card
+                  className="lms-learning-card"
+                  variant="borderless"
+                  style={{ marginBottom: 16 }}
+                >
+                  <Tag color="purple" style={{ marginBottom: 8 }}>
+                    Bài kiểm tra bài học
+                  </Tag>
                   <Title level={4}>{lectureQuiz.title}</Title>
                   <Paragraph>{lectureQuiz.description}</Paragraph>
                   {latestAttempt ? (
                     <div>
-                      <Alert showIcon
-                        type={latestAttempt.scorePercentage !== null && latestAttempt.scorePercentage >= 50 ? 'success' : 'error'}
-                        message={<span>Đã làm — Điểm: <strong>{latestAttempt.scorePercentage}%</strong> ({latestAttempt.score}/{latestAttempt.totalPoints})</span>}
+                      <Alert
+                        showIcon
+                        type={
+                          latestAttempt.scorePercentage !== null &&
+                          latestAttempt.scorePercentage >= 50
+                            ? 'success'
+                            : 'error'
+                        }
+                        message={
+                          <span>
+                            Đã làm — Điểm: <strong>{latestAttempt.scorePercentage}%</strong> (
+                            {latestAttempt.score}/{latestAttempt.totalPoints})
+                          </span>
+                        }
                         style={{ marginBottom: 16 }}
                       />
-                      <Button icon={<QuestionCircleOutlined />} onClick={() => window.open(`/quiz/${lectureQuiz.id}`, '_blank')} type="primary">Làm lại</Button>
+                      <Button
+                        icon={<QuestionCircleOutlined />}
+                        onClick={() => window.open(`/quiz/${lectureQuiz.id}`, '_blank')}
+                        type="primary"
+                      >
+                        Làm lại
+                      </Button>
                     </div>
                   ) : (
                     <div>
-                      <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>Bài học này có kèm bài kiểm tra.</Text>
-                      <Button icon={<QuestionCircleOutlined />} onClick={() => window.open(`/quiz/${lectureQuiz.id}`, '_blank')} type="primary" size="large">Làm bài kiểm tra</Button>
+                      <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
+                        Bài học này có kèm bài kiểm tra.
+                      </Text>
+                      <Button
+                        icon={<QuestionCircleOutlined />}
+                        onClick={() => window.open(`/quiz/${lectureQuiz.id}`, '_blank')}
+                        type="primary"
+                        size="large"
+                      >
+                        Làm bài kiểm tra
+                      </Button>
                     </div>
                   )}
                   <div style={{ marginTop: 12 }}>
-                    {lectureQuiz.duration ? <Tag icon={<ClockCircleOutlined />} color="blue" style={{ margin: 0 }}>{Math.round(lectureQuiz.duration / 60)} phút</Tag> : null}
+                    {lectureQuiz.duration ? (
+                      <Tag icon={<ClockCircleOutlined />} color="blue" style={{ margin: 0 }}>
+                        {Math.round(lectureQuiz.duration / 60)} phút
+                      </Tag>
+                    ) : null}
                     <Tag color="purple">{lectureQuiz.questions?.length ?? 0} câu hỏi</Tag>
-                    {lectureQuiz.passingScore ? <Tag color="green">Đạt: {lectureQuiz.passingScore}%</Tag> : null}
+                    {lectureQuiz.passingScore ? (
+                      <Tag color="green">Đạt: {lectureQuiz.passingScore}%</Tag>
+                    ) : null}
                   </div>
                 </Card>
               )}
-              {courseQuizzes.filter((cq) => cq.id !== quizId).map((cq) => (
-                <Card key={cq.id} className="lms-learning-card" variant="borderless" style={{ marginBottom: 16 }}>
-                  <Title level={4}>{cq.title}</Title>
-                  <Paragraph>{cq.description}</Paragraph>
-                  <Button icon={<QuestionCircleOutlined />} onClick={() => window.open(`/quiz/${cq.id}`, '_blank')} type="primary" size="large">Làm bài kiểm tra</Button>
-                  <div style={{ marginTop: 12 }}>
-                    {cq.duration ? <Tag icon={<ClockCircleOutlined />} color="blue" style={{ margin: 0 }}>{Math.round(cq.duration / 60)} phút</Tag> : null}
-                    <Tag color="purple">{cq.questions?.length ?? 0} câu hỏi</Tag>
-                    {cq.passingScore ? <Tag color="green">Đạt: {cq.passingScore}%</Tag> : null}
-                  </div>
-                </Card>
-              ))}
+              {courseQuizzes
+                .filter((cq) => cq.id !== quizId)
+                .map((cq) => (
+                  <Card
+                    key={cq.id}
+                    className="lms-learning-card"
+                    variant="borderless"
+                    style={{ marginBottom: 16 }}
+                  >
+                    <Title level={4}>{cq.title}</Title>
+                    <Paragraph>{cq.description}</Paragraph>
+                    <Button
+                      icon={<QuestionCircleOutlined />}
+                      onClick={() => window.open(`/quiz/${cq.id}`, '_blank')}
+                      type="primary"
+                      size="large"
+                    >
+                      Làm bài kiểm tra
+                    </Button>
+                    <div style={{ marginTop: 12 }}>
+                      {cq.duration ? (
+                        <Tag icon={<ClockCircleOutlined />} color="blue" style={{ margin: 0 }}>
+                          {Math.round(cq.duration / 60)} phút
+                        </Tag>
+                      ) : null}
+                      <Tag color="purple">{cq.questions?.length ?? 0} câu hỏi</Tag>
+                      {cq.passingScore ? <Tag color="green">Đạt: {cq.passingScore}%</Tag> : null}
+                    </div>
+                  </Card>
+                ))}
               {!lectureQuiz && courseQuizzes.length === 0 && (
                 <Text type="secondary">Không có bài kiểm tra nào.</Text>
               )}
@@ -1699,7 +1841,11 @@ export default function LearningPage() {
 
           {currentLecture ? (
             <div className="lms-learning-shell">
-              <Card className="lms-learning-player-card" variant="borderless" style={{ padding: 0 }}>
+              <Card
+                className="lms-learning-player-card"
+                variant="borderless"
+                style={{ padding: 0 }}
+              >
                 {playerError ? (
                   <Alert className="lms-learning-alert" title={playerError} showIcon type="error" />
                 ) : null}

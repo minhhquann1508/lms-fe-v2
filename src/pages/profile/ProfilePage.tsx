@@ -2,19 +2,10 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, Button, Card, Form, Input, Pagination, Typography, Upload, message } from 'antd';
-import {
-  BookOutlined,
-  CameraOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { BookOutlined, CameraOutlined, UserOutlined } from '@ant-design/icons';
 import { CourseCard, EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/components';
 import { queryKeys } from '@/config/query-keys';
-import {
-  authService,
-  enrollmentService,
-  uploadService,
-  userService,
-} from '@/services';
+import { authService, enrollmentService, uploadService, userService } from '@/services';
 import { useAuthStore } from '@/store/auth.store';
 import { usePageTitle, usePagination } from '@/hooks';
 import type { UpdateProfilePayload } from '@/services/user.service';
@@ -175,25 +166,25 @@ export default function ProfilePage() {
                 <Text className="lms-profile-summary__email" type="secondary">
                   {profile?.email}
                 </Text>
-              <div className="lms-profile-summary__badge-row">
-                <span className="lms-profile-summary__badge">
-                  {profile?.roleCode === 'super_admin' || profile?.roleCode === 'admin'
-                    ? 'Quản trị viên'
-                    : 'Học viên'}
-                </span>
-                <span className="lms-profile-summary__enrolled-badge">
-                  {enrolledCount} khoá học đã đăng ký
-                </span>
-                {joinedAt ? (
-                  <Text className="lms-profile-summary__meta" type="secondary">
-                    Tham gia từ {joinedAt}
-                  </Text>
-                ) : null}
+                <div className="lms-profile-summary__badge-row">
+                  <span className="lms-profile-summary__badge">
+                    {profile?.roleCode === 'super_admin' || profile?.roleCode === 'admin'
+                      ? 'Quản trị viên'
+                      : 'Học viên'}
+                  </span>
+                  <span className="lms-profile-summary__enrolled-badge">
+                    {enrolledCount} khoá học đã đăng ký
+                  </span>
+                  {joinedAt ? (
+                    <Text className="lms-profile-summary__meta" type="secondary">
+                      Tham gia từ {joinedAt}
+                    </Text>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
         <Card className="lms-profile-card lms-profile-card--form">
           <div className="lms-profile-form__header">

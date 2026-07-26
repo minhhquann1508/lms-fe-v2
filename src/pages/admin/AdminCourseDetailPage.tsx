@@ -42,12 +42,7 @@ import {
 import { EmptyState, ErrorState, PageHeader } from '@/components';
 import { useBreakpoint, usePageTitle } from '@/hooks';
 import { queryKeys } from '@/config/query-keys';
-import {
-  chapterService,
-  courseService,
-  enrollmentService,
-  lectureService,
-} from '@/services';
+import { chapterService, courseService, enrollmentService, lectureService } from '@/services';
 import type { Chapter, Course, Enrollment, Lecture } from '@/types';
 
 const { Paragraph, Text, Title } = Typography;
@@ -304,9 +299,8 @@ export default function AdminCourseDetailPage() {
       }
 
       const currentLectures = chapters.find((ch) => ch.id === activeChapterId)?.lectures ?? [];
-      const nextOrder = currentLectures.length > 0
-        ? Math.max(...currentLectures.map((l) => l.order)) + 1
-        : 1;
+      const nextOrder =
+        currentLectures.length > 0 ? Math.max(...currentLectures.map((l) => l.order)) + 1 : 1;
 
       const formData = new FormData();
       formData.append('name', values.name);
@@ -445,11 +439,14 @@ export default function AdminCourseDetailPage() {
         id: lecture.id,
         order: (index + 1) * 10,
       }));
-      lectureService.reorder(reorderItems).then(() => {
-        refreshCourse();
-      }).catch(() => {
-        message.error('Không thể sắp xếp bài giảng');
-      });
+      lectureService
+        .reorder(reorderItems)
+        .then(() => {
+          refreshCourse();
+        })
+        .catch(() => {
+          message.error('Không thể sắp xếp bài giảng');
+        });
 
       setDragLectureId(null);
     },
@@ -839,9 +836,13 @@ export default function AdminCourseDetailPage() {
                               <Text strong>{lecture.name}</Text>
                               <div className="lms-admin-course-detail__lecture-row-meta">
                                 {lecture.isPublished ? (
-                                  <Tag className="lms-badge-success" style={{ fontSize: 11 }}>Công khai</Tag>
+                                  <Tag className="lms-badge-success" style={{ fontSize: 11 }}>
+                                    Công khai
+                                  </Tag>
                                 ) : (
-                                  <Tag className="lms-badge-draft" style={{ fontSize: 11 }}>Bản nháp</Tag>
+                                  <Tag className="lms-badge-draft" style={{ fontSize: 11 }}>
+                                    Bản nháp
+                                  </Tag>
                                 )}
                                 {renderLectureAsset(lecture)}
                                 {lecture.duration > 0 ? (
@@ -885,7 +886,10 @@ export default function AdminCourseDetailPage() {
                                   type="text"
                                 />
                               </Tooltip>
-                              <Popconfirm onConfirm={() => deleteLecture.mutate(lecture.id)} title="Xoá bài giảng?">
+                              <Popconfirm
+                                onConfirm={() => deleteLecture.mutate(lecture.id)}
+                                title="Xoá bài giảng?"
+                              >
                                 <Tooltip title="Xoá">
                                   <Button
                                     aria-label="Xoá bài giảng"
@@ -1196,7 +1200,6 @@ export default function AdminCourseDetailPage() {
               </p>
             </Upload.Dragger>
           </Form.Item>
-
         </Form>
       </Modal>
     </div>

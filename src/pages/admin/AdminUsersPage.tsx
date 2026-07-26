@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Input, Modal, Select, Space, Table, Tag, message } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  UploadOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import { EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/components';
 import { queryKeys } from '@/config/query-keys';
 import { userService } from '@/services';
@@ -78,8 +73,12 @@ export default function AdminUsersPage() {
   });
 
   const createUserMutation = useMutation({
-    mutationFn: (payload: { email: string; password: string; fullName: string; roleCode: string }) =>
-      userService.createUser(payload),
+    mutationFn: (payload: {
+      email: string;
+      password: string;
+      fullName: string;
+      roleCode: string;
+    }) => userService.createUser(payload),
     onSuccess: () => {
       message.success('Đã tạo người dùng mới');
       setCreateModalOpen(false);
@@ -202,10 +201,7 @@ export default function AdminUsersPage() {
             setRoleCodeFilter(value === 'all' ? undefined : value);
             setPage(1);
           }}
-          options={[
-            { label: 'Tất cả vai trò', value: 'all' },
-            ...ROLE_OPTIONS,
-          ]}
+          options={[{ label: 'Tất cả vai trò', value: 'all' }, ...ROLE_OPTIONS]}
           style={{ minWidth: 160 }}
           value={roleCodeFilter ?? 'all'}
         />
