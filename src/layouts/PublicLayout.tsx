@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/auth.store';
-import { authService } from '@/services';
+import { authService, siteSettingService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
 import { useBreakpoint, useScrollDirection } from '@/hooks';
 import { NotificationDropdown } from '@/components';
@@ -30,6 +30,12 @@ export default function PublicLayout() {
     queryFn: async () => (await authService.getMe()).data,
     enabled: !!user,
     staleTime: 60_000,
+  });
+
+  const { data: settings } = useQuery({
+    queryKey: queryKeys.siteSettings.all,
+    queryFn: () => siteSettingService.get(),
+    staleTime: 300_000,
   });
 
   useEffect(() => {
@@ -85,8 +91,12 @@ export default function PublicLayout() {
         className={`lms-public-header ${breakpoint === 'mobile' && headerHidden ? 'lms-public-header--hidden' : ''}`}
       >
         <Link className="lms-brand" to="/">
-          <BookOutlined />
-          <span>LMS Platform</span>
+          {settings?.logoUrl ? (
+            <img src={settings.logoUrl} alt={settings.logoAlt ?? 'Logo'} className="lms-brand__logo" />
+          ) : (
+            <BookOutlined />
+          )}
+          <span>{settings?.footerBrandName ?? 'LMS Platform'}</span>
         </Link>
 
         <div className="lms-public-actions">
@@ -135,15 +145,27 @@ export default function PublicLayout() {
         <div className="lms-public-footer__inner">
           <div className="lms-public-footer__brand">
             <BookOutlined />
-            <span>LMS Platform</span>
+            <span>{settings?.footerBrandName ?? 'LMS Platform'}</span>
           </div>
           <div className="lms-public-footer__links">
-            <Link to="/">Trang chủ</Link>
-            <Link to="/">Khoá học</Link>
+            {settings?.footerLinks && settings.footerLinks.length > 0
+              ? settings.footerLinks.map((link, i) => (
+                  <Link key={i} to={link.url}>
+                    {link.label}
+                  </Link>
+                ))
+              : (
+                <>
+                  <Link to="/">Trang chủ</Link>
+                  <Link to="/">Khoá học</Link>
+                </>
+              )}
             {user ? <Link to="/profile">Hồ sơ</Link> : null}
           </div>
           <div className="lms-public-footer__copy">
-            &copy; {new Date().getFullYear()} LMS Platform. All rights reserved.
+            {settings?.footerCopyright
+              ? settings.footerCopyright.replace('{year}', String(new Date().getFullYear()))
+              : `© ${new Date().getFullYear()} LMS Platform. All rights reserved.`}
           </div>
         </div>
       </footer>
