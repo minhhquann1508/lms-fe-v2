@@ -81,7 +81,9 @@ export const antdTheme = {
     },
     Select: {
       borderRadius: 6,
+      borderRadiusLG: 6,
       optionBorderRadius: 6,
+      optionBorderRadiusLG: 6,
       controlHeight: 42,
       controlHeightLG: 42,
     },
