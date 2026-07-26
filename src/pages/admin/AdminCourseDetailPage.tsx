@@ -31,14 +31,16 @@ import {
   PlayCircleOutlined,
   PlusOutlined,
   UploadOutlined,
+  UserAddOutlined,
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { EmptyState, ErrorState } from '@/components';
+import { EmptyState, ErrorState, ItemPickerModal, AdminButton } from '@/components';
 import { useBreakpoint, usePageTitle } from '@/hooks';
 import { queryKeys } from '@/config/query-keys';
-import { chapterService, courseService, enrollmentService, lectureService } from '@/services';
+import { chapterService, courseService, enrollmentService, lectureService, userService } from '@/services';
 import type { Chapter, Enrollment, Lecture } from '@/types';
+import type { PickerItem } from '@/components/admin/ItemPickerModal';
 
 interface ChapterFormValues {
   name: string;
@@ -232,15 +234,6 @@ export default function AdminCourseDetailPage() {
     [course?.chapters],
   );
 
-  const lectureCount = chapters.reduce(
-    (total, chapter) => total + (chapter.lectures?.length ?? 0),
-    0,
-  );
-  const readyVideos = chapters.reduce(
-    (total, chapter) =>
-      total + (chapter.lectures?.filter((lecture) => Boolean(lecture.videoUrl)).length ?? 0),
-    0,
-  );
   const courseEnrollments = enrollmentsQuery.data?.items ?? [];
   const pendingApprovalCount = courseEnrollments.filter(
     (enrollment) => enrollment.status === 'pending',
@@ -388,6 +381,22 @@ export default function AdminCourseDetailPage() {
       void enrollmentsQuery.refetch();
     },
     onError: () => message.error('Không thể cập nhật trạng thái ghi danh'),
+  });
+
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const addUsersMutation = useMutation({
+    mutationFn: (userIds: string[]) => enrollmentService.addDirect(courseId, userIds),
+    onSuccess: (res) => {
+      message.success(`Đã thêm ${res.created} học viên`);
+      if (res.skipped > 0) {
+        message.info(`${res.skipped} học viên đã có trong khoá học`);
+      }
+      setPickerOpen(false);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.enrollments.all });
+      void enrollmentsQuery.refetch();
+    },
+    onError: () => message.error('Không thể thêm học viên'),
   });
 
   const handleDragStart = (lectureId: string) => {
@@ -819,6 +828,14 @@ export default function AdminCourseDetailPage() {
             </div>
           </div>
           <div className="lms-admin-block__actions">
+            <AdminButton
+              variant="primary"
+              size="sm"
+              icon={<UserAddOutlined />}
+              onClick={() => setPickerOpen(true)}
+            >
+              Thêm học viên
+            </AdminButton>
             <span className="lms-admin-badge lms-admin-badge--neutral">
               {courseEnrollments.length} yêu cầu
             </span>
@@ -1139,6 +1156,30 @@ export default function AdminCourseDetailPage() {
           ) : null}
         </Form>
       </Modal>
+
+      <ItemPickerModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title="Thêm học viên vào khoá học"
+        placeholder="Tìm theo tên hoặc email..."
+        itemLabel="học viên"
+        fetchItems={async ({ search: s, page: p, limit: l }) => {
+          const res = await userService.getAll({ search: s, page: p, limit: l });
+          return {
+            items: res.items.map((u) => ({
+              id: u.id,
+              cells: [
+                <span style={{ fontWeight: 600 }}>{u.fullName}</span>,
+                <span style={{ color: 'var(--color-textSecondary)' }}>{u.email}</span>,
+              ],
+              cols: 2,
+            } as PickerItem)),
+            total: res.total,
+          };
+        }}
+        onSubmit={async (ids) => addUsersMutation.mutateAsync(ids)}
+        loading={addUsersMutation.isPending}
+      />
     </div>
   );
 }
