@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Avatar, Button, Input, Modal, Select, Space, Table, Tag, message } from 'antd';
-import { PlusOutlined, SearchOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
-import { EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/components';
+import { Avatar, Button, Input, Modal, Select, Table, Tag, message } from 'antd';
+import { PlusOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect } from '@/components';
 import { queryKeys } from '@/config/query-keys';
 import { userService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
@@ -176,56 +176,62 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <PageHeader
-        subtitle="Quản lý người dùng, phân quyền và trạng thái tài khoản."
+      <AdminPageHead
         title="Quản lý người dùng"
+        subtitle="Quản lý người dùng, phân quyền và trạng thái tài khoản."
       />
 
-      <Space
-        size="middle"
-        style={{ alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--spacing-4)' }}
-      >
-        <Input
-          allowClear
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-          placeholder="Tìm kiếm..."
-          prefix={<SearchOutlined />}
-          style={{ width: 260 }}
-          value={search}
-        />
-        <Select
-          onChange={(value) => {
-            setRoleCodeFilter(value === 'all' ? undefined : value);
-            setPage(1);
-          }}
-          options={[{ label: 'Tất cả vai trò', value: 'all' }, ...ROLE_OPTIONS]}
-          style={{ minWidth: 160 }}
-          value={roleCodeFilter ?? 'all'}
-        />
-        <Select
-          onChange={(value) => {
-            setIsActiveFilter(value === 'all' ? undefined : value === 'active');
-            setPage(1);
-          }}
-          options={[
-            { label: 'Tất cả trạng thái', value: 'all' },
-            { label: 'Active', value: 'active' },
-            { label: 'Inactive', value: 'inactive' },
-          ]}
-          style={{ minWidth: 160 }}
-          value={isActiveFilter === undefined ? 'all' : isActiveFilter ? 'active' : 'inactive'}
-        />
-        <div style={{ flex: 1 }} />
-        <Button icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)} type="primary">
-          Tạo người dùng
-        </Button>
-        <Button icon={<UploadOutlined />} onClick={() => setImportModalOpen(true)}>
-          Import CSV
-        </Button>
-      </Space>
+      <div className="lms-admin-courses-toolbar" style={{ marginTop: 24 }}>
+        <div className="lms-admin-toolbar-left">
+          <AdminSearchInput
+            value={search}
+            onChange={(v) => { setSearch(v); setPage(1); }}
+          />
+          <AdminFilterSelect
+            value={roleCodeFilter ?? 'all'}
+            onChange={(v) => {
+              setRoleCodeFilter(v === 'all' ? undefined : v);
+              setPage(1);
+            }}
+            options={[
+              { label: 'Tất cả vai trò', value: 'all' },
+              ...ROLE_OPTIONS,
+            ]}
+            ariaLabel="Lọc vai trò"
+          />
+          <AdminFilterSelect
+            value={
+              isActiveFilter === undefined ? 'all' : isActiveFilter ? 'active' : 'inactive'
+            }
+            onChange={(v) => {
+              setIsActiveFilter(v === 'all' ? undefined : v === 'active');
+              setPage(1);
+            }}
+            options={[
+              { label: 'Tất cả trạng thái', value: 'all' },
+              { label: 'Active', value: 'active' },
+              { label: 'Inactive', value: 'inactive' },
+            ]}
+            ariaLabel="Lọc trạng thái"
+          />
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <AdminButton
+            variant="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setCreateModalOpen(true)}
+          >
+            Tạo người dùng
+          </AdminButton>
+          <AdminButton
+            variant="outline"
+            icon={<UploadOutlined />}
+            onClick={() => setImportModalOpen(true)}
+          >
+            Import CSV
+          </AdminButton>
+        </div>
+      </div>
 
       {isError ? <ErrorState inline onRetry={() => refetch()} /> : null}
       {isLoading ? <LoadingSkeleton count={8} variant="table-row" /> : null}
