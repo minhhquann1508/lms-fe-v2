@@ -8,8 +8,10 @@ import {
   Modal,
   Popconfirm,
   Result,
+  Segmented,
   Spin,
   Tooltip,
+  Upload,
   message,
 } from 'antd';
 import {
@@ -28,6 +30,7 @@ import {
   LinkOutlined,
   PlayCircleOutlined,
   PlusOutlined,
+  UploadOutlined,
   UserAddOutlined,
   UserOutlined,
   VideoCameraOutlined,
@@ -54,6 +57,8 @@ interface LectureFormValues {
 function formatMinutes(duration = 0) {
   return `${Math.round(duration / 60)} phút`;
 }
+
+type VideoSourceType = 'upload' | 'url';
 
 function formatDate(value?: string) {
   if (!value) {
@@ -172,8 +177,10 @@ export default function AdminCourseDetailPage() {
   const [lectureModal, setLectureModal] = useState(false);
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null);
   const [editingLecture, setEditingLecture] = useState<Lecture | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [dragLectureId, setDragLectureId] = useState<string | null>(null);
   const [openChapterIds, setOpenChapterIds] = useState<Set<string>>(new Set());
+  const [videoSourceType, setVideoSourceType] = useState<VideoSourceType>('url');
   const [videoUrlInput, setVideoUrlInput] = useState('');
   const [chapterForm] = Form.useForm<ChapterFormValues>();
   const [lectureForm] = Form.useForm<LectureFormValues>();
@@ -275,19 +282,27 @@ export default function AdminCourseDetailPage() {
       const nextOrder =
         currentLectures.length > 0 ? Math.max(...currentLectures.map((l) => l.order)) + 1 : 1;
 
-      await lectureService.create({
-        name: values.name,
-        chapterId: activeChapterId,
-        description: values.description ?? '',
-        isPublished: Boolean(values.isPublished),
-        order: nextOrder,
-        videoUrl: videoUrlInput || undefined,
-      });
+      const formData = new FormData();
+      formData.append('name', values.name);
+      formData.append('chapterId', activeChapterId);
+      formData.append('description', values.description ?? '');
+      formData.append('isPublished', String(Boolean(values.isPublished)));
+      formData.append('order', String(nextOrder));
+
+      if (videoSourceType === 'upload' && videoFile) {
+        formData.append('file', videoFile);
+      } else if (videoSourceType === 'url' && videoUrlInput) {
+        formData.append('videoUrl', videoUrlInput);
+      }
+
+      await lectureService.create(formData);
     },
     onSuccess: () => {
       message.success('Tạo bài giảng thành công');
       setLectureModal(false);
+      setVideoFile(null);
       setVideoUrlInput('');
+      setVideoSourceType('upload');
       lectureForm.resetFields();
       refreshCourse();
     },
@@ -302,20 +317,28 @@ export default function AdminCourseDetailPage() {
         throw new Error('LECTURE_NOT_SELECTED');
       }
 
-      await lectureService.update(editingLecture.id, {
-        name: values.name,
-        chapterId: editingLecture.chapterId,
-        description: values.description ?? '',
-        isPublished: Boolean(values.isPublished),
-        order: editingLecture.order,
-        videoUrl: videoUrlInput || undefined,
-      });
+      const formData = new FormData();
+      formData.append('name', values.name);
+      formData.append('chapterId', editingLecture.chapterId);
+      formData.append('description', values.description ?? '');
+      formData.append('isPublished', String(Boolean(values.isPublished)));
+      formData.append('order', String(editingLecture.order));
+
+      if (videoSourceType === 'upload' && videoFile) {
+        formData.append('file', videoFile);
+      } else if (videoSourceType === 'url' && videoUrlInput) {
+        formData.append('videoUrl', videoUrlInput);
+      }
+
+      await lectureService.update(editingLecture.id, formData);
     },
     onSuccess: () => {
       message.success('Cập nhật bài giảng thành công');
       setLectureModal(false);
       setEditingLecture(null);
+      setVideoFile(null);
       setVideoUrlInput('');
+      setVideoSourceType('upload');
       lectureForm.resetFields();
       refreshCourse();
     },
@@ -447,7 +470,9 @@ export default function AdminCourseDetailPage() {
   const openCreateLecture = (chapterId: string) => {
     setActiveChapterId(chapterId);
     setEditingLecture(null);
+    setVideoFile(null);
     setVideoUrlInput('');
+    setVideoSourceType('upload');
     lectureForm.resetFields();
     lectureForm.setFieldsValue({ isPublished: true });
     setLectureModal(true);
@@ -456,7 +481,9 @@ export default function AdminCourseDetailPage() {
   const openEditLecture = (lecture: Lecture) => {
     setActiveChapterId(lecture.chapterId);
     setEditingLecture(lecture);
+    setVideoFile(null);
     setVideoUrlInput(lecture.videoUrl ?? '');
+    setVideoSourceType('upload');
     lectureForm.setFieldsValue({
       description: lecture.description,
       isPublished: lecture.isPublished,
@@ -982,7 +1009,9 @@ export default function AdminCourseDetailPage() {
         onCancel={() => {
           setLectureModal(false);
           setEditingLecture(null);
+          setVideoFile(null);
           setVideoUrlInput('');
+          setVideoSourceType('upload');
         }}
         onOk={() => void handleLectureSubmit()}
         open={lectureModal}
@@ -1042,15 +1071,78 @@ export default function AdminCourseDetailPage() {
                 display: 'block',
               }}
             >
-              Iframe URL
+              Nguồn video
             </label>
-            <Input
-              placeholder="https://iframe.mediadelivery.net/embed/..."
-              size="large"
-              value={videoUrlInput}
-              onChange={(e) => setVideoUrlInput(e.target.value)}
+            <Segmented
+              onChange={(value) => setVideoSourceType(value as VideoSourceType)}
+              options={[
+                { label: 'Iframe URL', value: 'url', icon: <LinkOutlined /> },
+                { label: 'Upload', value: 'upload', icon: <UploadOutlined /> },
+              ]}
+              value={videoSourceType}
             />
           </div>
+
+          {videoSourceType === 'upload' ? (
+            <div>
+              <Upload.Dragger
+                accept="video/*"
+                beforeUpload={(file) => {
+                  setVideoFile(file as File);
+                  return false;
+                }}
+                maxCount={1}
+                onRemove={() => setVideoFile(null)}
+                style={{
+                  border: '2px dashed var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 28,
+                }}
+              >
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'rgb(15 23 42)' }}>
+                  {videoFile
+                    ? videoFile.name
+                    : editingLecture?.videoUrl
+                      ? 'Thả file để thay video'
+                      : 'Kéo thả hoặc bấm để chọn video'}
+                </p>
+                <p style={{ margin: '6px 0 0', fontSize: 13, color: 'rgb(100 116 139)' }}>
+                  {editingLecture?.videoUrl
+                    ? 'Chỉ upload khi cần thay mới.'
+                    : 'Một file cho mỗi bài giảng.'}
+                </p>
+              </Upload.Dragger>
+            </div>
+          ) : (
+            <div>
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--color-textSecondary)',
+                  marginBottom: 6,
+                  display: 'block',
+                }}
+              >
+                Iframe URL
+              </label>
+              <Input
+                placeholder="https://iframe.mediadelivery.net/embed/..."
+                size="large"
+                value={videoUrlInput}
+                onChange={(e) => setVideoUrlInput(e.target.value)}
+              />
+            </div>
+          )}
+
+          {!editingLecture && videoSourceType === 'upload' ? (
+            <p style={{ fontSize: 12, color: 'var(--color-textDisabled)', margin: 0 }}>
+              Video sẽ được xử lý sau khi tải lên. Bạn có thể nhập Iframe URL thủ công nếu muốn.
+            </p>
+          ) : null}
         </Form>
       </Modal>
 
