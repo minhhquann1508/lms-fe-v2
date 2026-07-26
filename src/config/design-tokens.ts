@@ -10,24 +10,16 @@ export const breakpoints = {
 
 export const tokens = {
   color: {
-    // Brand & Accent
-    'brand-coral': '#E85A4F',
-    'brand-magenta': '#E91E8C',
-    'brand-blue': '#2563EB',
-    'brand-blue-deep': '#1E40AF',
-    'brand-blue-700': '#1D4ED8',
-    'brand-cyan': '#06B6D4',
-    'brand-blue-200': '#DBEAFE',
-    'brand-purple': '#9333EA',
+    primary: '#2563EB',
+    'primary-hover': '#1D4ED8',
+    'primary-light': '#DBEAFE',
 
-    // Surface
     canvas: '#FFFFFF',
     surface: '#F8FAFC',
     'surface-soft': '#F1F5F9',
     hairline: '#E2E8F0',
     'hairline-soft': '#F1F5F9',
 
-    // Text
     ink: '#0F172A',
     'ink-strong': '#000000',
     charcoal: '#334155',
@@ -36,18 +28,14 @@ export const tokens = {
     stone: '#CBD5E1',
     muted: '#94A3B8',
 
-    // Semantic
     'success-bg': '#DCFCE7',
-    'success-text': '#166534',
+    'success-text': '#059669',
 
-    // Base mapping (legacy/support)
-    primary: '#000000',
     'on-primary': '#FFFFFF',
     info: '#2563EB',
     warning: '#F59E0B',
     error: '#DC2626',
 
-    // Legacy backward-compatible aliases
     surfaceMuted: '#F8FAFC',
     background: '#FFFFFF',
     border: '#E2E8F0',
@@ -72,46 +60,47 @@ export const tokens = {
     hero: '96px',
   },
   typography: {
-    'hero-display': { fontSize: '80px', lineHeight: 1.1, letterSpacing: '-2px', fontWeight: 600 },
-    'display-lg': { fontSize: '56px', lineHeight: 1.1, letterSpacing: '-1.5px', fontWeight: 600 },
-    'heading-lg': { fontSize: '40px', lineHeight: 1.2, letterSpacing: '-1px', fontWeight: 600 },
-    'heading-md': { fontSize: '32px', lineHeight: 1.25, letterSpacing: '-0.5px', fontWeight: 600 },
-    'heading-sm': { fontSize: '24px', lineHeight: 1.3, letterSpacing: '0', fontWeight: 600 },
-    'card-title': { fontSize: '20px', lineHeight: 1.4, letterSpacing: '0', fontWeight: 600 },
-    subtitle: { fontSize: '18px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 500 },
-    'body-md': { fontSize: '16px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
-    'body-md-bold': { fontSize: '16px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 700 },
-    'body-sm': { fontSize: '14px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
-    'body-sm-medium': { fontSize: '14px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 500 },
-    caption: { fontSize: '13px', lineHeight: 1.7, letterSpacing: '0', fontWeight: 400 },
-    'caption-bold': { fontSize: '13px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 600 },
-    micro: { fontSize: '12px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
-    'button-md': { fontSize: '14px', lineHeight: 1.4, letterSpacing: '0', fontWeight: 600 },
+    hero: { fontSize: '40px', lineHeight: 1.1, letterSpacing: '-0.5px', fontWeight: 700 },
+    'heading-lg': { fontSize: '24px', lineHeight: 1.3, letterSpacing: '0', fontWeight: 700 },
+    'heading-md': { fontSize: '20px', lineHeight: 1.35, letterSpacing: '0', fontWeight: 600 },
+    'heading-sm': { fontSize: '18px', lineHeight: 1.4, letterSpacing: '0', fontWeight: 600 },
+    subtitle: { fontSize: '16px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
+    'body-md': { fontSize: '14px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
+    'body-md-medium': { fontSize: '14px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 500 },
+    'body-md-bold': { fontSize: '14px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 700 },
+    'body-sm': { fontSize: '13px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
+    'body-sm-medium': { fontSize: '13px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 500 },
+    'body-sm-bold': { fontSize: '13px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 600 },
+    caption: { fontSize: '12px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
+    micro: { fontSize: '11px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
+    'button-md': { fontSize: '14px', lineHeight: 1.0, letterSpacing: '0', fontWeight: 600 },
   },
   radius: {
     xs: '4px',
     sm: '6px',
-    md: '8px',
-    lg: '12px',
-    xl: '16px',
-    xxl: '20px',
-    xxxl: '24px',
+    md: '12px',
+    lg: '16px',
+    xl: '24px',
+    xxl: '28px',
     hero: '32px',
     full: '9999px',
   },
   shadow: {
-    subtle: 'rgba(0, 0, 0, 0.04) 0px 1px 2px 0px',
-    card: 'rgba(0, 0, 0, 0.08) 0px 4px 6px 0px',
-    atmospheric: 'rgba(0, 0, 0, 0.08) 0px 0px 22px 0px',
-    modal: 'rgba(36, 36, 36, 0.08) 0px 12px 16px -4px',
+    subtle: '0 1px 2px rgba(0,0,0,0.04)',
+    card: '0 4px 24px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+    'card-hover': '0 12px 32px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.04)',
+    atmospheric: '0 0 22px rgba(0,0,0,0.08)',
+    modal: '0 12px 16px -4px rgba(36,36,36,0.08)',
+    'button-primary': '0 1px 3px rgba(37,99,235,0.2), 0 4px 12px rgba(37,99,235,0.15)',
+    'button-primary-hover': '0 4px 8px rgba(37,99,235,0.25), 0 8px 20px rgba(37,99,235,0.18)',
+    'blue-glow': '0 4px 16px rgba(37,99,235,0.25)',
   },
 } as const;
 
-/* ── Legacy shorthands mapped to new tokens for backward compat ── */
 const legacy = {
   color: {
-    primaryHover: '#1F2937',
-    success: '#166534',
+    primaryHover: '#1D4ED8',
+    success: '#059669',
     warning: '#F59E0B',
     error: '#DC2626',
     info: '#2563EB',
@@ -129,7 +118,7 @@ const legacy = {
     10: '64px',
   },
   typography: {
-    body: { fontSize: '16px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
+    body: { fontSize: '14px', lineHeight: 1.5, letterSpacing: '0', fontWeight: 400 },
     h1: { fontSize: '32px', lineHeight: 1.25, letterSpacing: '0', fontWeight: 700 },
     h2: { fontSize: '26px', lineHeight: 1.3, letterSpacing: '0', fontWeight: 700 },
     h3: { fontSize: '22px', lineHeight: 1.35, letterSpacing: '0', fontWeight: 600 },
@@ -152,14 +141,20 @@ const legacy = {
   },
 };
 
-function addTokenLines(lines: string[], prefix: string, obj: Record<string, any>) {
+function addTokenLines(lines: string[], prefix: string, obj: Record<string, unknown>) {
   Object.entries(obj).forEach(([key, value]) => {
     if (typeof value === 'object' && value !== null && 'fontSize' in value) {
-      lines.push(`--font-size-${key}: ${value.fontSize};`);
-      lines.push(`--line-height-${key}: ${value.lineHeight};`);
-      lines.push(`--font-weight-${key}: ${value.fontWeight};`);
-      if (value.letterSpacing !== undefined) {
-        lines.push(`--letter-spacing-${key}: ${value.letterSpacing};`);
+      const t = value as {
+        fontSize: string;
+        lineHeight: number;
+        fontWeight: number;
+        letterSpacing?: string;
+      };
+      lines.push(`--font-size-${key}: ${t.fontSize};`);
+      lines.push(`--line-height-${key}: ${t.lineHeight};`);
+      lines.push(`--font-weight-${key}: ${t.fontWeight};`);
+      if (t.letterSpacing !== undefined) {
+        lines.push(`--letter-spacing-${key}: ${t.letterSpacing};`);
       }
     } else {
       lines.push(`--${prefix}-${key}: ${value};`);
@@ -169,20 +164,16 @@ function addTokenLines(lines: string[], prefix: string, obj: Record<string, any>
 
 export function buildCssVariables() {
   const lines: string[] = [];
-
   addTokenLines(lines, 'color', tokens.color);
   addTokenLines(lines, 'spacing', tokens.spacing);
   addTokenLines(lines, 'radius', tokens.radius);
   addTokenLines(lines, 'shadow', tokens.shadow);
   addTokenLines(lines, '', tokens.typography);
-
-  // Legacy backward-compatible mappings
   addTokenLines(lines, 'color', legacy.color);
   addTokenLines(lines, 'spacing', legacy.spacing);
   addTokenLines(lines, 'radius', legacy.radius);
   addTokenLines(lines, 'shadow', legacy.shadow);
   addTokenLines(lines, '', legacy.typography);
-
   lines.push(`--breakpoint-mobile-small: ${breakpoints.mobileSmall}px;`);
   lines.push(`--breakpoint-mobile-max: ${breakpoints.mobileMax}px;`);
   lines.push(`--breakpoint-tablet-min: ${breakpoints.tabletMin}px;`);
@@ -190,19 +181,16 @@ export function buildCssVariables() {
   lines.push(`--breakpoint-desktop-min: ${breakpoints.desktopMin}px;`);
   lines.push(`--breakpoint-desktop-max: ${breakpoints.desktopMax}px;`);
   lines.push(`--breakpoint-wide-desktop: ${breakpoints.wideDesktop}px;`);
-
   return `:root{${lines.join('')}}`;
 }
 
 export function injectDesignTokens() {
   const styleId = 'lms-design-tokens';
   const existing = document.getElementById(styleId);
-
   if (existing) {
     existing.textContent = buildCssVariables();
     return;
   }
-
   const style = document.createElement('style');
   style.id = styleId;
   style.textContent = buildCssVariables();

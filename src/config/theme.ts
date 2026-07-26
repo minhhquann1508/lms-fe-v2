@@ -1,16 +1,6 @@
 import { tokens } from './design-tokens';
 
 export const colors = {
-  // Brand & Accent
-  'brand-coral': tokens.color['brand-coral'],
-  'brand-magenta': tokens.color['brand-magenta'],
-  'brand-blue': tokens.color['brand-blue'],
-  'brand-blue-deep': tokens.color['brand-blue-deep'],
-  'brand-blue-700': tokens.color['brand-blue-700'],
-  'brand-cyan': tokens.color['brand-cyan'],
-  'brand-blue-200': tokens.color['brand-blue-200'],
-  'brand-purple': tokens.color['brand-purple'],
-
   // Surface
   canvas: tokens.color.canvas,
   surface: tokens.color.surface,
@@ -55,11 +45,11 @@ export const colors = {
 
 export const antdTheme = {
   token: {
-    colorPrimary: colors.ink,
-    colorSuccess: colors['success-text'],
+    colorPrimary: colors.primary,
+    colorSuccess: colors.success,
     colorWarning: colors.warning,
     colorError: colors.error,
-    colorInfo: colors['brand-blue'],
+    colorInfo: colors.primary,
     colorBgContainer: colors.canvas,
     colorBgLayout: colors.surface,
     colorBorder: colors.hairline,
@@ -71,7 +61,8 @@ export const antdTheme = {
     fontSize: 16,
     fontSizeLG: 20,
     fontSizeSM: 13,
-    fontFamily: "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily:
+      "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     controlHeight: 40,
     controlHeightLG: 44,
     boxShadow: tokens.shadow.card,
