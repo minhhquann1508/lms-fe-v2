@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Input, Modal, Select, Space, Table, Tag, message } from 'antd';
-import { PlusOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
-import { EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect } from '@/components';
+import { PlusOutlined, UploadOutlined, UserOutlined, BookOutlined } from '@ant-design/icons';
+import { EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect, ItemPickerModal } from '@/components';
 import { queryKeys } from '@/config/query-keys';
-import { userService } from '@/services';
+import { userService, courseService, enrollmentService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
 import { ADMIN, SUPER_ADMIN, USER } from '@/constants';
 import type { User } from '@/types';
+import type { PickerItem } from '@/components/admin/ItemPickerModal';
 
 const ROLE_OPTIONS = [
   { label: 'User', value: USER },
@@ -172,7 +173,52 @@ export default function AdminUsersPage() {
       render: (value: string) => new Date(value).toLocaleDateString('vi-VN'),
       width: 120,
     },
+    {
+      title: '',
+      key: 'actions',
+      width: 50,
+      render: (_: unknown, record: User) => (
+        <button
+          className="lms-admin-table-action"
+          title="Thêm vào khoá học"
+          aria-label="Thêm người dùng vào khoá học"
+          onClick={() => {
+            setCoursePickerForUser(record.id);
+            setCoursePickerOpen(true);
+          }}
+        >
+          <BookOutlined />
+        </button>
+      ),
+    },
   ];
+
+  const [userPickerOpen, setUserPickerOpen] = useState(false);
+  const [coursePickerOpen, setCoursePickerOpen] = useState(false);
+  const [coursePickerForUser, setCoursePickerForUser] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+  const addCoursesMutation = useMutation({
+    mutationFn: async ({ userIds, courseIds }: { userIds: string[]; courseIds: string[] }) => {
+      let created = 0;
+      let skipped = 0;
+      for (const courseId of courseIds) {
+        const res = await enrollmentService.addDirect(courseId, userIds);
+        created += res.created;
+        skipped += res.skipped;
+      }
+      return { created, skipped };
+    },
+    onSuccess: (res) => {
+      message.success(`Đã thêm ${res.created} bản ghi`);
+      if (res.skipped > 0) message.info(`${res.skipped} bản ghi đã tồn tại`);
+      setCoursePickerOpen(false);
+      setUserPickerOpen(false);
+      setCoursePickerForUser(null);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.enrollments.all });
+    },
+    onError: () => message.error('Không thể thêm khoá học'),
+  });
 
   return (
     <div>
@@ -216,6 +262,13 @@ export default function AdminUsersPage() {
           />
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
+          <AdminButton
+            variant="outline-accent"
+            icon={<BookOutlined />}
+            onClick={() => setUserPickerOpen(true)}
+          >
+            Thêm vào khoá học
+          </AdminButton>
           <AdminButton
             variant="outline-accent"
             icon={<UploadOutlined />}
@@ -329,6 +382,70 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </Modal>
+
+      <ItemPickerModal
+        open={userPickerOpen}
+        onClose={() => setUserPickerOpen(false)}
+        title="Chọn người dùng"
+        placeholder="Tìm theo tên hoặc email..."
+        itemLabel="người dùng"
+        fetchItems={async ({ search: s, page: p, limit: l }) => {
+          const res = await userService.getAll({ search: s, page: p, limit: l });
+          return {
+            items: res.items.map((u) => ({
+              id: u.id,
+              cells: [
+                <span style={{ fontWeight: 600 }}>{u.fullName}</span>,
+                <span style={{ color: 'var(--color-textSecondary)' }}>{u.email}</span>,
+              ],
+              cols: 2,
+            } as PickerItem)),
+            total: res.total,
+          };
+        }}
+        onSubmit={async (ids) => {
+          setSelectedUserIds(ids);
+          setUserPickerOpen(false);
+          setCoursePickerOpen(true);
+        }}
+      />
+
+      <ItemPickerModal
+        open={coursePickerOpen}
+        onClose={() => {
+          setCoursePickerOpen(false);
+          setCoursePickerForUser(null);
+          setSelectedUserIds([]);
+        }}
+        title={coursePickerForUser ? 'Thêm khoá học cho người dùng' : 'Chọn khoá học'}
+        placeholder="Tìm theo tên khoá học..."
+        itemLabel="khoá học"
+        fetchItems={async ({ search: s, page: p, limit: l }) => {
+          const res = await courseService.getAll({ search: s, page: p, limit: l });
+          return {
+            items: res.items.map((c) => ({
+              id: c.id,
+              cells: [
+                <span style={{ fontWeight: 600 }}>{c.name}</span>,
+                <span>
+                  {c.isPublished ? (
+                    <span className="lms-admin-badge lms-admin-badge--success">Đã xuất bản</span>
+                  ) : (
+                    <span className="lms-admin-badge lms-admin-badge--draft">Bản nháp</span>
+                  )}
+                </span>,
+              ],
+              cols: 2,
+            } as PickerItem)),
+            total: res.total,
+          };
+        }}
+        onSubmit={async (courseIds) => {
+          const userIds = coursePickerForUser ? [coursePickerForUser] : selectedUserIds;
+          return addCoursesMutation.mutateAsync({ userIds, courseIds });
+        }}
+        loading={addCoursesMutation.isPending}
+      />
     </div>
   );
 }
