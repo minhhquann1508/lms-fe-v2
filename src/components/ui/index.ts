@@ -8,3 +8,4 @@ export * from './PageTransition';
 export * from './ResponsiveDrawer';
 export * from './StatCard';
 export { default as NotificationDropdown } from './NotificationDropdown';
+export { default as GeometricBg } from './GeometricBg';

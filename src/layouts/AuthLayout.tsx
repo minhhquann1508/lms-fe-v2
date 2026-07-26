@@ -1,18 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import { BookOutlined } from '@ant-design/icons';
+import GeometricBg from '@/components/ui/GeometricBg';
 
 export default function AuthLayout() {
   return (
     <div className="lms-auth-page">
-      {/* Abstract geometric decoration */}
-      <div className="lms-auth-geo lms-auth-geo--1" />
-      <div className="lms-auth-geo lms-auth-geo--2" />
-      <div className="lms-auth-geo lms-auth-geo--3" />
-      <div className="lms-auth-geo lms-auth-geo--4" />
-      <div className="lms-auth-geo-dot lms-auth-geo-dot--1" />
-      <div className="lms-auth-geo-dot lms-auth-geo-dot--2" />
-      <div className="lms-auth-geo-dot lms-auth-geo-dot--3" />
-      <div className="lms-auth-geo-dot lms-auth-geo-dot--4" />
+      <GeometricBg />
 
       <div className="lms-auth-wrapper">
         {/* Branding header */}

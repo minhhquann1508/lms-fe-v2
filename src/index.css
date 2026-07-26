@@ -4579,14 +4579,14 @@ select,
 
 /* ── Abstract geometric decoration ── */
 
-.lms-auth-geo {
+.lms-geo {
   position: fixed;
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
 }
 
-.lms-auth-geo--1 {
+.lms-geo--1 {
   width: 320px;
   height: 320px;
   top: -80px;
@@ -4594,7 +4594,7 @@ select,
   background: radial-gradient(circle, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
 }
 
-.lms-auth-geo--2 {
+.lms-geo--2 {
   width: 200px;
   height: 200px;
   top: 30%;
@@ -4602,7 +4602,7 @@ select,
   background: radial-gradient(circle, rgba(37, 99, 235, 0.04) 0%, transparent 70%);
 }
 
-.lms-auth-geo--3 {
+.lms-geo--3 {
   width: 160px;
   height: 160px;
   bottom: 10%;
@@ -4610,7 +4610,7 @@ select,
   border: 2px solid rgba(37, 99, 235, 0.06);
 }
 
-.lms-auth-geo--4 {
+.lms-geo--4 {
   width: 100px;
   height: 100px;
   top: 15%;
@@ -4618,7 +4618,7 @@ select,
   border: 1.5px solid rgba(59, 130, 246, 0.08);
 }
 
-.lms-auth-geo-dot {
+.lms-geo-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -4628,19 +4628,19 @@ select,
   z-index: 0;
 }
 
-.lms-auth-geo-dot--1 {
+.lms-geo-dot--1 {
   top: 20%;
   left: 15%;
 }
-.lms-auth-geo-dot--2 {
+.lms-geo-dot--2 {
   top: 60%;
   right: 12%;
 }
-.lms-auth-geo-dot--3 {
+.lms-geo-dot--3 {
   top: 75%;
   left: 25%;
 }
-.lms-auth-geo-dot--4 {
+.lms-geo-dot--4 {
   top: 10%;
   right: 25%;
 }
