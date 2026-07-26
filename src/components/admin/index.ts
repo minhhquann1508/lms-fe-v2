@@ -7,3 +7,4 @@ export { default as AdminBadge } from './AdminBadge';
 export { default as AdminPagination } from './AdminPagination';
 export { default as AdminSearchInput } from './AdminSearchInput';
 export { default as AdminFilterSelect } from './AdminFilterSelect';
+export { default as AdminListPageShell } from './AdminListPageShell';

@@ -2,32 +2,17 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import {
-  Badge,
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Modal,
-  Popconfirm,
-  Select,
-  Switch,
-  Tag,
-  Typography,
-  message,
-  Alert,
-} from 'antd';
+import { Badge, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Switch, Tag, Typography, message, Alert } from 'antd';
 import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
   PlusOutlined,
-  SearchOutlined,
   UploadOutlined,
   FileExcelOutlined,
 } from '@ant-design/icons';
 import { saveAs } from 'file-saver';
-import { DataTable, PageHeader } from '@/components';
+import { DataTable, AdminListPageShell, AdminSearchInput, AdminFilterSelect, AdminButton } from '@/components';
 import { queryKeys } from '@/config/query-keys';
 import { courseService, quizService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
@@ -340,80 +325,55 @@ export default function AdminQuizzesPage() {
   ];
 
   return (
-    <div>
-      <PageHeader
-        actions={[
-          {
-            key: 'import',
-            node: (
-              <Button
-                icon={<UploadOutlined />}
-                onClick={openImportModal}
-                size="large"
-                style={{ display: 'flex', alignItems: 'center' }}
-              >
-                Nhập Excel
-              </Button>
-            ),
-          },
-          {
-            key: 'export',
-            node: (
-              <Button
-                icon={<DownloadOutlined />}
-                onClick={handleExportList}
-                loading={exportListMutation.isPending}
-                size="large"
-                style={{ display: 'flex', alignItems: 'center' }}
-              >
-                Xuất Excel
-              </Button>
-            ),
-          },
-          {
-            key: 'create',
-            node: (
-              <Button
-                icon={<PlusOutlined />}
-                onClick={() => navigate('/admin/quizzes/create')}
-                size="large"
-                type="primary"
-              >
-                Tạo bài kiểm tra
-              </Button>
-            ),
-          },
-        ]}
-        subtitle="Quản lý các bài kiểm tra trắc nghiệm và coding"
-        title="Bài kiểm tra"
-      />
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <Input
-          allowClear
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          placeholder="Tìm kiếm bài kiểm tra..."
-          prefix={<SearchOutlined />}
-          style={{ maxWidth: 320 }}
-          value={search}
-        />
-        <Select
-          allowClear
-          onChange={(value) => {
-            setTypeFilter(value);
-            setPage(1);
-          }}
-          placeholder="Lọc theo loại"
-          style={{ width: 160 }}
-          value={typeFilter}
-        >
-          <Select.Option value="multiple_choice">Trắc nghiệm</Select.Option>
-          <Select.Option value="coding">Coding</Select.Option>
-        </Select>
-      </div>
+    <AdminListPageShell
+      title="Bài kiểm tra"
+      subtitle="Quản lý các bài kiểm tra trắc nghiệm và coding"
+      filters={
+        <>
+          <AdminSearchInput
+            value={search}
+            onChange={(v) => { setSearch(v); setPage(1); }}
+            placeholder="Tìm kiếm bài kiểm tra..."
+          />
+          <AdminFilterSelect
+            value={typeFilter ?? ''}
+            onChange={(v) => { setTypeFilter(v || undefined); setPage(1); }}
+            options={[
+              { label: 'Tất cả loại', value: '' },
+              { label: 'Trắc nghiệm', value: 'multiple_choice' },
+              { label: 'Coding', value: 'coding' },
+            ]}
+            ariaLabel="Lọc theo loại"
+          />
+        </>
+      }
+      actions={
+        <>
+          <AdminButton
+            variant="outline"
+            icon={<UploadOutlined />}
+            onClick={openImportModal}
+          >
+            Nhập Excel
+          </AdminButton>
+          <AdminButton
+            variant="outline"
+            icon={<DownloadOutlined />}
+            onClick={handleExportList}
+            loading={exportListMutation.isPending}
+          >
+            Xuất Excel
+          </AdminButton>
+          <AdminButton
+            variant="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/admin/quizzes/create')}
+          >
+            Tạo bài kiểm tra
+          </AdminButton>
+        </>
+      }
+    >
 
       <DataTable
         columns={columns}
@@ -621,6 +581,6 @@ export default function AdminQuizzesPage() {
           </div>
         </div>
       </Modal>
-    </div>
+    </AdminListPageShell>
   );
 }
