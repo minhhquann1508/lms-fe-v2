@@ -81,6 +81,8 @@ export const antdTheme = {
     },
     Select: {
       borderRadius: Number.parseInt(tokens.radius.md),
+      borderRadiusLG: Number.parseInt(tokens.radius.md),
+      optionBorderRadius: Number.parseInt(tokens.radius.sm),
     },
     Card: {
       borderRadius: Number.parseInt(tokens.radius.xl),
