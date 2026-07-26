@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
       <div className="lms-dashboard-summary" style={{ marginBottom: 20 }}>
         <div className="lms-dashboard-summary__item">
-          <div className="lms-dashboard-summary__icon">
+          <div className="lms-dashboard-summary__icon lms-dashboard-summary__icon--courses">
             <BookOutlined />
           </div>
           <div className="lms-dashboard-summary__body">
@@ -134,7 +134,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="lms-dashboard-summary__item">
-          <div className="lms-dashboard-summary__icon">
+          <div className="lms-dashboard-summary__icon lms-dashboard-summary__icon--purchased">
             <UserOutlined />
           </div>
           <div className="lms-dashboard-summary__body">
@@ -143,7 +143,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="lms-dashboard-summary__item">
-          <div className="lms-dashboard-summary__icon">
+          <div className="lms-dashboard-summary__icon lms-dashboard-summary__icon--revenue">
             <DollarOutlined />
           </div>
           <div className="lms-dashboard-summary__body">
