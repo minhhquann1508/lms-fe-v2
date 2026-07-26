@@ -1,4 +1,4 @@
-import { useState, useRef, type FormEvent } from 'react';
+import { useState, useMemo, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,55 @@ import type { ActiveLoginDevice } from '@/types';
 
 type ForgotMode = 'login' | 'forgot' | 'sent';
 
+function EmailIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M22 4L12 13 2 4" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      <circle cx="12" cy="16" r="1" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M20 21a8 8 0 1 0-16 0" />
+    </svg>
+  );
+}
+
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [revoking, setRevoking] = useState(false);
@@ -30,8 +79,8 @@ export default function AuthPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { setAuth } = useAuthStore();
 
-  const pendingRevokeSessionId = useRef(searchParams.get('revokeSessionId'));
-  if (pendingRevokeSessionId.current && searchParams.has('revokeSessionId')) {
+  const pendingRevokeSessionId = useMemo(() => searchParams.get('revokeSessionId'), [searchParams]);
+  if (pendingRevokeSessionId && searchParams.has('revokeSessionId')) {
     const next = new URLSearchParams(searchParams);
     next.delete('revokeSessionId');
     setSearchParams(next, { replace: true });
@@ -73,9 +122,7 @@ export default function AuthPage() {
   };
 
   const onLogin = (values: LoginFormValues) => {
-    const revokeId = pendingRevokeSessionId.current ?? undefined;
-    pendingRevokeSessionId.current = null;
-    return doLogin(values, revokeId);
+    return doLogin(values, pendingRevokeSessionId ?? undefined);
   };
 
   const handleRevokeEarliest = () => {
@@ -146,50 +193,6 @@ export default function AuthPage() {
     const emailInput = e.currentTarget.elements.namedItem('email') as HTMLInputElement;
     if (emailInput?.value) onForgotPassword(emailInput.value);
   };
-
-  /* ── Inline SVG icons for inputs ── */
-  const EmailIcon = () => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="M22 4L12 13 2 4" />
-    </svg>
-  );
-
-  const LockIcon = () => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-      <circle cx="12" cy="16" r="1" />
-    </svg>
-  );
-
-  const UserIcon = () => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="8" r="4" />
-      <path d="M20 21a8 8 0 1 0-16 0" />
-    </svg>
-  );
 
   /* ── Render ── */
   if (forgotMode === 'sent') {
