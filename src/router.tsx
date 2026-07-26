@@ -95,6 +95,7 @@ const AdminQuizzesPage = lazyWithChunkRetry(() => import('@/pages/admin/AdminQui
 const AdminQuizDetailPage = lazyWithChunkRetry(() => import('@/pages/admin/AdminQuizDetailPage'));
 const QuizCreatePage = lazyWithChunkRetry(() => import('@/pages/admin/QuizCreatePage'));
 const AdminQuizEditPage = lazyWithChunkRetry(() => import('@/pages/admin/AdminQuizEditPage'));
+const SiteSettingsPage = lazyWithChunkRetry(() => import('@/pages/admin/SiteSettingsPage'));
 const NotFoundPage = lazyWithChunkRetry(() => import('@/pages/not-found/NotFoundPage'));
 
 function LazyWrap({ children }: { children: React.ReactNode }) {
@@ -311,6 +312,14 @@ export const router = createBrowserRouter([
             element: (
               <LazyWrap>
                 <AdminQuizEditPage />
+              </LazyWrap>
+            ),
+          },
+          {
+            path: '/admin/site-settings',
+            element: (
+              <LazyWrap>
+                <SiteSettingsPage />
               </LazyWrap>
             ),
           },
