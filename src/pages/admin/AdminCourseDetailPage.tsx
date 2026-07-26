@@ -681,7 +681,7 @@ export default function AdminCourseDetailPage() {
 
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <button
-                        className="lms-admin-btn lms-admin-btn--outline lms-admin-btn--sm"
+                        className="lms-admin-btn lms-admin-btn--primary lms-admin-btn--sm"
                         onClick={() => openCreateLecture(chapter.id)}
                       >
                         <PlusOutlined />
@@ -699,7 +699,7 @@ export default function AdminCourseDetailPage() {
                         onConfirm={() => deleteChapter.mutate(chapter.id)}
                         title="Xoá chương?"
                       >
-                        <button className="lms-admin-btn lms-admin-btn--danger lms-admin-btn--sm">
+                        <button className="lms-admin-btn lms-admin-btn--danger-outline lms-admin-btn--sm">
                           <DeleteOutlined />
                           {breakpoint === 'desktop' ? 'Xoá' : null}
                         </button>

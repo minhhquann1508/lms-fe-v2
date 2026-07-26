@@ -4133,6 +4133,15 @@ select,
 .lms-admin-btn--danger:hover {
   background: rgba(220, 38, 38, 0.06);
 }
+.lms-admin-btn--danger-outline {
+  background: transparent;
+  color: var(--color-error);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+}
+.lms-admin-btn--danger-outline:hover {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: var(--color-error);
+}
 .lms-admin-btn--sm {
   height: 34px;
   padding: 0 14px;
