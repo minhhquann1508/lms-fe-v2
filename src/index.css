@@ -4553,7 +4553,7 @@ select,
 }
 
 .lms-home-hero__highlight {
-  background: linear-gradient(135deg, #fca5a5, #c084fc);
+  background: linear-gradient(135deg, #fb7185, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -4574,13 +4574,10 @@ select,
   margin-top: 8px;
 }
 
-.lms-home-hero__search .ant-input {
+.lms-home-hero__search .ant-input-affix-wrapper {
   width: 100%;
-  height: 56px;
-  padding: 0 24px 0 52px;
-  font-family: inherit;
-  font-size: 15px;
-  color: var(--color-ink);
+  height: 52px;
+  padding: 0;
   background: white;
   border: none;
   border-radius: var(--radius-hero);
@@ -4591,10 +4588,23 @@ select,
   transition: box-shadow 250ms ease;
 }
 
-.lms-home-hero__search .ant-input:focus {
+.lms-home-hero__search .ant-input-affix-wrapper-focused {
   box-shadow:
     0 6px 32px rgba(37, 99, 235, 0.2),
     0 8px 40px rgba(37, 99, 235, 0.12);
+}
+
+.lms-home-hero__search .ant-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 24px 0 52px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--color-ink);
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .lms-home-hero__search .ant-input::placeholder {
@@ -4602,8 +4612,9 @@ select,
 }
 
 .lms-home-hero__search .ant-input-prefix {
-  margin-right: 8px;
+  margin-inline-end: 12px;
   color: var(--color-textDisabled);
+  font-size: 18px;
 }
 
 .lms-home-hero__stats {
@@ -5041,8 +5052,11 @@ select,
   .lms-home-hero__desc {
     font-size: 14px;
   }
+  .lms-home-hero__search .ant-input-affix-wrapper {
+    height: 46px;
+  }
+
   .lms-home-hero__search .ant-input {
-    height: 48px;
     font-size: 14px;
     padding: 0 16px 0 44px;
   }
