@@ -214,6 +214,8 @@ export default function AdminUsersPage() {
             ]}
             ariaLabel="Lọc trạng thái"
           />
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
           <AdminButton
             variant="outline-accent"
             icon={<UploadOutlined />}
@@ -221,14 +223,14 @@ export default function AdminUsersPage() {
           >
             Import CSV
           </AdminButton>
+          <AdminButton
+            variant="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setCreateModalOpen(true)}
+          >
+            Tạo người dùng
+          </AdminButton>
         </div>
-        <AdminButton
-          variant="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setCreateModalOpen(true)}
-        >
-          Tạo người dùng
-        </AdminButton>
       </div>
 
       {isError ? <ErrorState inline onRetry={() => refetch()} /> : null}
