@@ -80,8 +80,8 @@ export const antdTheme = {
       controlHeightLG: 44,
     },
     Select: {
-      borderRadius: Number.parseInt(tokens.radius.md),
-      optionBorderRadius: Number.parseInt(tokens.radius.sm),
+      borderRadius: 6,
+      optionBorderRadius: 6,
     },
     Card: {
       borderRadius: Number.parseInt(tokens.radius.xl),

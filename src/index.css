@@ -5084,15 +5084,6 @@ select,
   color: var(--color-textDisabled);
 }
 
-/* ── Admin: Ant Design Select Override ── */
-
-.lms-admin-select .ant-select-selector {
-  border-radius: var(--radius-md) !important;
-}
-.lms-admin-select.ant-select-focused .ant-select-selector {
-  box-shadow: 0 0 0 3px var(--color-primary-light) !important;
-}
-
 /* ── Admin: Pagination ── */
 
 .lms-admin-pagination {

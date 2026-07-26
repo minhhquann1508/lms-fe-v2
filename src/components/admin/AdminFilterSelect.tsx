@@ -12,11 +12,9 @@ export default function AdminFilterSelect({ value, onChange, options, ariaLabel,
   return (
     <Select
       aria-label={ariaLabel}
-      className="lms-admin-select"
       value={value}
       onChange={(v) => onChange(v as string)}
       options={options}
-      size="large"
       style={{ minWidth: 160, ...style }}
     />
   );
