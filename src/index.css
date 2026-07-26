@@ -4091,10 +4091,10 @@ select,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 38px;
-  padding: 0 16px;
+  height: 42px;
+  padding: 0 18px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -4134,9 +4134,9 @@ select,
   background: rgba(220, 38, 38, 0.06);
 }
 .lms-admin-btn--sm {
-  height: 32px;
-  padding: 0 12px;
-  font-size: 12px;
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
 }
 
 /* ── Admin: Badges ── */
@@ -4145,9 +4145,9 @@ select,
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: var(--radius-full);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .lms-admin-badge--success {
@@ -4214,7 +4214,7 @@ select,
   letter-spacing: 0.05em;
 }
 .lms-admin-hero__title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--color-ink);
   line-height: 1.2;
@@ -4286,7 +4286,7 @@ select,
   border-bottom: 1px solid var(--color-hairline-soft);
 }
 .lms-admin-block__title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-ink);
 }
@@ -4339,7 +4339,7 @@ select,
   min-width: 0;
 }
 .lms-admin-chapter__name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--color-ink);
 }
@@ -4422,7 +4422,7 @@ select,
   gap: 2px;
 }
 .lms-admin-lecture__name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-ink);
 }
@@ -4430,7 +4430,7 @@ select,
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .lms-admin-lecture__actions {
   display: flex;
@@ -4439,8 +4439,8 @@ select,
   flex-shrink: 0;
 }
 .lms-admin-lecture__btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   border: none;
@@ -4448,7 +4448,7 @@ select,
   color: var(--color-textSecondary);
   border-radius: var(--radius-xs);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   transition: all 200ms ease;
 }
 .lms-admin-lecture__btn:hover {
@@ -4463,9 +4463,9 @@ select,
 /* ── Admin: Toggle switch ── */
 
 .lms-admin-toggle {
-  width: 40px;
-  height: 22px;
-  border-radius: 11px;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   background: var(--color-border);
@@ -4481,15 +4481,15 @@ select,
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: white;
   transition: transform 200ms ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .lms-admin-toggle--on::after {
-  transform: translateX(18px);
+  transform: translateX(20px);
 }
 
 /* ── Admin: Enrollment ── */
