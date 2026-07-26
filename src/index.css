@@ -4441,6 +4441,16 @@ select,
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+.lms-admin-btn--outline-accent {
+  background: var(--color-canvas);
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+}
+.lms-admin-btn--outline-accent:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
 .lms-admin-btn--ghost {
   background: transparent;
   color: var(--color-textSecondary);
