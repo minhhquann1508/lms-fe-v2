@@ -4983,7 +4983,12 @@ select,
 }
 
 .lms-course-chapter__lectures {
+  display: none;
   border-top: 1px solid var(--color-hairline-soft);
+}
+
+.lms-course-chapter--open .lms-course-chapter__lectures {
+  display: block;
 }
 
 .lms-course-lecture {

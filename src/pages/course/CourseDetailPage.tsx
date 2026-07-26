@@ -272,7 +272,7 @@ export default function CourseDetailPage() {
                     </span>
                     <span className="lms-course-chapter__caret">▼</span>
                   </button>
-                  <div className="lms-course-chapter__lectures" style={{ display: 'none' }}>
+                  <div className="lms-course-chapter__lectures">
                     {chapter.lectures?.map((lecture) => (
                       <div className="lms-course-lecture" key={lecture.id}>
                         <span className="lms-course-lecture__icon">
