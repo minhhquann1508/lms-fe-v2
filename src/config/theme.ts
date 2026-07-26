@@ -36,7 +36,7 @@ export const colors = {
   textSecondary: tokens.color.textSecondary,
   textTertiary: tokens.color.textDisabled,
   textInverse: '#ffffff',
-  sidebarBg: tokens.color.ink,
+  sidebarBg: tokens.color.surface,
   sidebarText: tokens.color.stone,
   headerBg: tokens.color.canvas,
 };
@@ -98,9 +98,13 @@ export const antdTheme = {
       bodyBg: colors.surface,
     },
     Menu: {
-      darkItemBg: colors.sidebarBg,
-      darkItemSelectedBg: tokens.color.ink,
-      itemBorderRadius: Number.parseInt(tokens.radius.lg),
+      itemBg: 'transparent',
+      itemSelectedBg: tokens.color.primary,
+      itemSelectedColor: '#ffffff',
+      itemColor: tokens.color.slate,
+      itemHoverColor: tokens.color.ink,
+      itemHoverBg: tokens.color['surface-soft'],
+      itemBorderRadius: Number.parseInt(tokens.radius.md),
     },
     Table: {
       borderRadiusLG: Number.parseInt(tokens.radius.lg),
