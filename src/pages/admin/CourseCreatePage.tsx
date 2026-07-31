@@ -1,16 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Switch,
-  Upload,
-  message,
-} from 'antd';
+import { Button, Card, Form, Input, InputNumber, Select, Switch, Upload, message } from 'antd';
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components';
 import { courseService, categoryService, uploadService } from '@/services';
@@ -64,11 +54,7 @@ export default function CourseCreatePage() {
         actions={[
           {
             key: 'cancel',
-            node: (
-              <Button onClick={() => navigate('/admin/courses')}>
-                Huỷ
-              </Button>
-            ),
+            node: <Button onClick={() => navigate('/admin/courses')}>Huỷ</Button>,
           },
         ]}
         subtitle="Điền thông tin cơ bản để tạo khoá học. Bạn có thể chỉnh sửa sau."
@@ -168,7 +154,10 @@ export default function CourseCreatePage() {
                       <p className="ant-upload-text" style={{ fontSize: 14, fontWeight: 600 }}>
                         Bấm hoặc kéo thả ảnh vào đây
                       </p>
-                      <p className="ant-upload-hint" style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      <p
+                        className="ant-upload-hint"
+                        style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}
+                      >
                         JPG, PNG, WEBP • tối đa 5MB
                       </p>
                     </Upload.Dragger>
@@ -215,12 +204,7 @@ export default function CourseCreatePage() {
           <Button size="large" onClick={() => navigate('/admin/courses')}>
             Huỷ
           </Button>
-          <Button
-            htmlType="submit"
-            loading={createMutation.isPending}
-            size="large"
-            type="primary"
-          >
+          <Button htmlType="submit" loading={createMutation.isPending} size="large" type="primary">
             Tạo khoá học
           </Button>
         </div>

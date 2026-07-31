@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Drawer, Dropdown, Layout, Menu, Space, Typography } from 'antd';
+import { Avatar, Drawer, Dropdown } from 'antd';
 import {
   AuditOutlined,
   BookOutlined,
@@ -7,47 +7,34 @@ import {
   FormOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
+  MenuOutlined,
   MenuUnfoldOutlined,
+  SettingOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+import type { ComponentType } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/auth.store';
 import { authService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
 import { useBreakpoint } from '@/hooks';
-import { colors } from '@/config/theme';
 import { NotificationDropdown } from '@/components';
 
-const { Header, Sider, Content } = Layout;
+interface NavItem {
+  key: string;
+  icon: ComponentType;
+  label: string;
+}
 
-const siderMenuItems = [
-  {
-    key: '/admin/dashboard',
-    icon: <DashboardOutlined />,
-    label: <Link to="/admin/dashboard">Dashboard</Link>,
-  },
-  {
-    key: '/admin/courses',
-    icon: <BookOutlined />,
-    label: <Link to="/admin/courses">Khoá học</Link>,
-  },
-  {
-    key: '/admin/enrollments',
-    icon: <AuditOutlined />,
-    label: <Link to="/admin/enrollments">Ghi danh</Link>,
-  },
-  {
-    key: '/admin/users',
-    icon: <TeamOutlined />,
-    label: <Link to="/admin/users">Người dùng</Link>,
-  },
-  {
-    key: '/admin/quizzes',
-    icon: <FormOutlined />,
-    label: <Link to="/admin/quizzes">Bài kiểm tra</Link>,
-  },
+const navItems: NavItem[] = [
+  { key: '/admin/dashboard', icon: DashboardOutlined, label: 'Dashboard' },
+  { key: '/admin/courses', icon: BookOutlined, label: 'Khoá học' },
+  { key: '/admin/enrollments', icon: AuditOutlined, label: 'Ghi danh' },
+  { key: '/admin/users', icon: TeamOutlined, label: 'Người dùng' },
+  { key: '/admin/quizzes', icon: FormOutlined, label: 'Bài kiểm tra' },
+  { key: '/admin/site-settings', icon: SettingOutlined, label: 'Cài đặt trang' },
 ];
 
 export default function AdminLayout() {
@@ -74,7 +61,7 @@ export default function AdminLayout() {
   const isMobile = breakpoint === 'mobile';
   const isTablet = breakpoint === 'tablet';
   const sidebarCollapsed = isTablet || collapsed;
-  const sidebarWidth = sidebarCollapsed ? 64 : 240;
+  const sidebarWidth = sidebarCollapsed ? 72 : 256;
 
   const handleLogout = async () => {
     try {
@@ -97,36 +84,55 @@ export default function AdminLayout() {
     },
   ];
 
-  const selectedKey = siderMenuItems.find((item) => location.pathname.startsWith(item.key))?.key;
+  const selectedKey = navItems
+    .filter((item) => location.pathname.startsWith(item.key))
+    .sort((a, b) => b.key.length - a.key.length)[0]?.key;
+
+  const renderNav = (onClick?: () => void) => (
+    <nav className="lms-admin-nav">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = selectedKey === item.key;
+        const className = [
+          'lms-admin-nav__item',
+          isActive ? 'lms-admin-nav__item--active' : '',
+          sidebarCollapsed && !isMobile ? 'lms-admin-nav__item--collapsed' : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
+        return (
+          <Link key={item.key} to={item.key} className={className} onClick={onClick}>
+            <Icon />
+            {(!sidebarCollapsed || isMobile) && <span>{item.label}</span>}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
+  const renderLogo = () => (
+    <div className="lms-admin-logo">
+      <BookOutlined />
+      {(!sidebarCollapsed || isMobile) && <span>LMS Admin</span>}
+    </div>
+  );
 
   const sidebar = (
     <>
-      <div className="lms-admin-logo">
-        <BookOutlined />
-        {!sidebarCollapsed || isMobile ? <Typography.Text>LMS Admin</Typography.Text> : null}
-      </div>
-      <Menu
-        items={siderMenuItems}
-        mode="inline"
-        onClick={() => setDrawerOpen(false)}
-        selectedKeys={selectedKey ? [selectedKey] : []}
-        theme="dark"
-      />
+      {renderLogo()}
+      {renderNav(isMobile ? () => setDrawerOpen(false) : undefined)}
     </>
   );
 
   return (
-    <Layout className="lms-admin-layout">
+    <div className="lms-admin-shell">
       {!isMobile ? (
-        <Sider
+        <aside
           className="lms-admin-sidebar"
-          collapsed={sidebarCollapsed}
-          collapsedWidth={64}
-          theme="dark"
-          width={240}
+          style={{ width: sidebarWidth }}
         >
           {sidebar}
-        </Sider>
+        </aside>
       ) : (
         <Drawer
           className="lms-admin-mobile-drawer"
@@ -134,23 +140,26 @@ export default function AdminLayout() {
           open={drawerOpen}
           placement="left"
           width={280}
+          styles={{ body: { padding: 0, background: 'var(--color-surface)' } }}
         >
-          <div style={{ background: colors.sidebarBg, minHeight: '100vh' }}>{sidebar}</div>
+          {sidebar}
         </Drawer>
       )}
 
-      <Layout className="lms-admin-main" style={{ marginLeft: isMobile ? 0 : sidebarWidth }}>
-        <Header className="lms-admin-header">
-          <Button
+      <div className="lms-admin-main" style={{ marginLeft: isMobile ? 0 : sidebarWidth }}>
+        <header className="lms-admin-topbar">
+          <button
             aria-label={
               isMobile || sidebarCollapsed ? 'Mở điều hướng admin' : 'Thu gọn điều hướng admin'
             }
-            icon={isMobile || sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            className="lms-admin-topbar__toggle"
             onClick={() => (isMobile ? setDrawerOpen(true) : setCollapsed(!collapsed))}
-            type="text"
-          />
+            type="button"
+          >
+            {isMobile ? <MenuOutlined /> : sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="lms-admin-topbar__right">
             <NotificationDropdown />
 
             <Dropdown
@@ -158,24 +167,24 @@ export default function AdminLayout() {
               placement="bottomRight"
               trigger={['click']}
             >
-              <Space className="lms-account-trigger lms-account-trigger--compact" size={10}>
+              <div className="lms-admin-user-trigger">
                 <Avatar
-                  size={30}
+                  size={32}
                   src={user?.avatar}
                   icon={!user?.avatar ? <UserOutlined /> : undefined}
                 />
                 {!isMobile ? (
-                  <span className="lms-account-trigger__name">{user?.fullName}</span>
+                  <span className="lms-admin-user-trigger__name">{user?.fullName}</span>
                 ) : null}
-              </Space>
+              </div>
             </Dropdown>
           </div>
-        </Header>
+        </header>
 
-        <Content className="lms-admin-content">
+        <main className="lms-admin-content">
           <Outlet />
-        </Content>
-      </Layout>
-    </Layout>
+        </main>
+      </div>
+    </div>
   );
 }

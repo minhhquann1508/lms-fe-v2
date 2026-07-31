@@ -2,10 +2,10 @@ import axios from './axios-instance';
 import type { Lecture, ApiEnvelope } from '@/types';
 
 export const lectureService = {
-  async create(data: FormData): Promise<{ jobId: string }> {
+  async create(data: FormData): Promise<Lecture> {
     const res = (await axios.post('/lectures', data, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    })) as unknown as ApiEnvelope<{ jobId: string }>;
+    })) as unknown as ApiEnvelope<Lecture>;
     return res.data;
   },
 
@@ -14,10 +14,10 @@ export const lectureService = {
     return res.data;
   },
 
-  async update(id: string, data: FormData): Promise<{ jobId?: string }> {
+  async update(id: string, data: FormData): Promise<Lecture> {
     const res = (await axios.put(`/lectures/${id}`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    })) as unknown as ApiEnvelope<{ jobId?: string }>;
+    })) as unknown as ApiEnvelope<Lecture>;
     return res.data;
   },
 

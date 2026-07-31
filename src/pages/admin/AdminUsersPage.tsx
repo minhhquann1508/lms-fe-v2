@@ -1,18 +1,14 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Input, Modal, Select, Space, Table, Tag, message } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  UploadOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/components';
+import { PlusOutlined, UserOutlined, BookOutlined } from '@ant-design/icons';
+import { EmptyState, ErrorState, LoadingSkeleton, AdminPageHead, AdminButton, AdminSearchInput, AdminFilterSelect, ItemPickerModal } from '@/components';
 import { queryKeys } from '@/config/query-keys';
-import { userService } from '@/services';
+import { userService, courseService, enrollmentService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
 import { ADMIN, SUPER_ADMIN, USER } from '@/constants';
 import type { User } from '@/types';
+import type { PickerItem } from '@/components/admin/ItemPickerModal';
 
 const ROLE_OPTIONS = [
   { label: 'User', value: USER },
@@ -78,8 +74,12 @@ export default function AdminUsersPage() {
   });
 
   const createUserMutation = useMutation({
-    mutationFn: (payload: { email: string; password: string; fullName: string; roleCode: string }) =>
-      userService.createUser(payload),
+    mutationFn: (payload: {
+      email: string;
+      password: string;
+      fullName: string;
+      roleCode: string;
+    }) => userService.createUser(payload),
     onSuccess: () => {
       message.success('Đã tạo người dùng mới');
       setCreateModalOpen(false);
@@ -173,63 +173,111 @@ export default function AdminUsersPage() {
       render: (value: string) => new Date(value).toLocaleDateString('vi-VN'),
       width: 120,
     },
+    {
+      title: '',
+      key: 'actions',
+      width: 50,
+      render: (_: unknown, record: User) => (
+        <button
+          className="lms-admin-table-action"
+          title="Thêm vào khoá học"
+          aria-label="Thêm người dùng vào khoá học"
+          onClick={() => {
+            setCoursePickerForUser(record.id);
+            setCoursePickerOpen(true);
+          }}
+        >
+          <BookOutlined />
+        </button>
+      ),
+    },
   ];
+
+  const [userPickerOpen, setUserPickerOpen] = useState(false);
+  const [coursePickerOpen, setCoursePickerOpen] = useState(false);
+  const [coursePickerForUser, setCoursePickerForUser] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+  const addCoursesMutation = useMutation({
+    mutationFn: async ({ userIds, courseIds }: { userIds: string[]; courseIds: string[] }) => {
+      let created = 0;
+      let skipped = 0;
+      for (const courseId of courseIds) {
+        const res = await enrollmentService.addDirect(courseId, userIds);
+        created += res.created;
+        skipped += res.skipped;
+      }
+      return { created, skipped };
+    },
+    onSuccess: (res) => {
+      message.success(`Đã thêm ${res.created} bản ghi`);
+      if (res.skipped > 0) message.info(`${res.skipped} bản ghi đã tồn tại`);
+      setCoursePickerOpen(false);
+      setUserPickerOpen(false);
+      setCoursePickerForUser(null);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.enrollments.all });
+    },
+    onError: () => message.error('Không thể thêm khoá học'),
+  });
 
   return (
     <div>
-      <PageHeader
-        subtitle="Quản lý người dùng, phân quyền và trạng thái tài khoản."
+      <AdminPageHead
         title="Quản lý người dùng"
+        subtitle="Quản lý người dùng, phân quyền và trạng thái tài khoản."
       />
 
-      <Space
-        size="middle"
-        style={{ alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--spacing-4)' }}
-      >
-        <Input
-          allowClear
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-          placeholder="Tìm kiếm..."
-          prefix={<SearchOutlined />}
-          style={{ width: 260 }}
-          value={search}
-        />
-        <Select
-          onChange={(value) => {
-            setRoleCodeFilter(value === 'all' ? undefined : value);
-            setPage(1);
-          }}
-          options={[
-            { label: 'Tất cả vai trò', value: 'all' },
-            ...ROLE_OPTIONS,
-          ]}
-          style={{ minWidth: 160 }}
-          value={roleCodeFilter ?? 'all'}
-        />
-        <Select
-          onChange={(value) => {
-            setIsActiveFilter(value === 'all' ? undefined : value === 'active');
-            setPage(1);
-          }}
-          options={[
-            { label: 'Tất cả trạng thái', value: 'all' },
-            { label: 'Active', value: 'active' },
-            { label: 'Inactive', value: 'inactive' },
-          ]}
-          style={{ minWidth: 160 }}
-          value={isActiveFilter === undefined ? 'all' : isActiveFilter ? 'active' : 'inactive'}
-        />
-        <div style={{ flex: 1 }} />
-        <Button icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)} type="primary">
-          Tạo người dùng
-        </Button>
-        <Button icon={<UploadOutlined />} onClick={() => setImportModalOpen(true)}>
-          Import CSV
-        </Button>
-      </Space>
+      <div className="lms-admin-courses-toolbar" style={{ marginTop: 24 }}>
+        <div className="lms-admin-toolbar-left">
+          <AdminSearchInput
+            value={search}
+            onChange={(v) => { setSearch(v); setPage(1); }}
+          />
+          <AdminFilterSelect
+            value={roleCodeFilter ?? 'all'}
+            onChange={(v) => {
+              setRoleCodeFilter(v === 'all' ? undefined : v);
+              setPage(1);
+            }}
+            options={[
+              { label: 'Tất cả vai trò', value: 'all' },
+              ...ROLE_OPTIONS,
+            ]}
+            ariaLabel="Lọc vai trò"
+          />
+          <AdminFilterSelect
+            value={
+              isActiveFilter === undefined ? 'all' : isActiveFilter ? 'active' : 'inactive'
+            }
+            onChange={(v) => {
+              setIsActiveFilter(v === 'all' ? undefined : v === 'active');
+              setPage(1);
+            }}
+            options={[
+              { label: 'Tất cả trạng thái', value: 'all' },
+              { label: 'Active', value: 'active' },
+              { label: 'Inactive', value: 'inactive' },
+            ]}
+            ariaLabel="Lọc trạng thái"
+          />
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <AdminButton
+            variant="outline-accent"
+            icon={<BookOutlined />}
+            onClick={() => setUserPickerOpen(true)}
+          >
+            Thêm vào khoá học
+          </AdminButton>
+          <AdminButton
+            variant="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setCreateModalOpen(true)}
+          >
+            Tạo người dùng
+          </AdminButton>
+        </div>
+      </div>
 
       {isError ? <ErrorState inline onRetry={() => refetch()} /> : null}
       {isLoading ? <LoadingSkeleton count={8} variant="table-row" /> : null}
@@ -259,7 +307,8 @@ export default function AdminUsersPage() {
         footer={null}
         onCancel={() => setCreateModalOpen(false)}
         open={createModalOpen}
-        title="Tạo người dùng mới"
+        title="Tạo ngưởi dùng mới"
+        width={640}
       >
         <form
           onSubmit={(e) => {
@@ -303,7 +352,8 @@ export default function AdminUsersPage() {
         footer={null}
         onCancel={() => setImportModalOpen(false)}
         open={importModalOpen}
-        title="Import người dùng (CSV)"
+        title="Import ngưởi dùng (CSV)"
+        width={640}
       >
         <div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: 12, fontSize: 13 }}>
@@ -327,6 +377,74 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </Modal>
+
+      <ItemPickerModal
+        open={userPickerOpen}
+        onClose={() => setUserPickerOpen(false)}
+        title="Chọn người dùng"
+        placeholder="Tìm theo tên hoặc email..."
+        itemLabel="người dùng"
+        fetchItems={async ({ search: s, page: p, limit: l }) => {
+          const res = await userService.getAll({ search: s, page: p, limit: l });
+          return {
+            items: res.items.map((u) => ({
+              id: u.id,
+              cells: [
+                <span style={{ fontWeight: 600 }}>{u.fullName}</span>,
+                <span style={{ color: 'var(--color-textSecondary)' }}>{u.email}</span>,
+              ],
+              cols: 2,
+            } as PickerItem)),
+            total: res.total,
+          };
+        }}
+        onSubmit={async (ids) => {
+          setSelectedUserIds(ids);
+          setUserPickerOpen(false);
+          setCoursePickerOpen(true);
+        }}
+      />
+
+      <ItemPickerModal
+        open={coursePickerOpen}
+        onClose={() => {
+          setCoursePickerOpen(false);
+          setCoursePickerForUser(null);
+          setSelectedUserIds([]);
+        }}
+        title={coursePickerForUser ? 'Thêm khoá học cho người dùng' : 'Chọn khoá học'}
+        placeholder="Tìm theo tên khoá học..."
+        itemLabel="khoá học"
+        fetchItems={async ({ search: s, page: p, limit: l }) => {
+          const res = await courseService.getAll({ search: s, page: p, limit: l });
+          return {
+            items: res.items.map((c) => ({
+              id: c.id,
+              cells: [
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 44, height: 30, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: 'var(--color-surface-soft)' }}>
+                    {c.thumbnail ? (
+                      <img src={c.thumbnail} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'var(--color-textDisabled)', fontSize: 14 }}>
+                        <BookOutlined />
+                      </div>
+                    )}
+                  </div>
+                  <span style={{ fontWeight: 600 }}>{c.name}</span>
+                </div>,
+              ],
+              cols: 1,
+            } as PickerItem)),
+            total: res.total,
+          };
+        }}
+        onSubmit={async (courseIds) => {
+          const userIds = coursePickerForUser ? [coursePickerForUser] : selectedUserIds;
+          return addCoursesMutation.mutateAsync({ userIds, courseIds });
+        }}
+        loading={addCoursesMutation.isPending}
+      />
     </div>
   );
 }

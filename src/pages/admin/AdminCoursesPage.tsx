@@ -11,9 +11,6 @@ import {
   Select,
   Space,
   Switch,
-  Table,
-  Tag,
-  Tooltip,
   Upload,
   message,
 } from 'antd';
@@ -22,10 +19,18 @@ import {
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
-  SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { CourseCard, EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/components';
+import {
+  CourseCard,
+  EmptyState,
+  ErrorState,
+  LoadingSkeleton,
+  AdminPageHead,
+  AdminButton,
+  AdminSearchInput,
+  AdminFilterSelect,
+} from '@/components';
 import { courseService, categoryService, uploadService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
 import { useBreakpoint, useDebounce, usePageTitle } from '@/hooks';
@@ -40,11 +45,27 @@ function formatDate(value?: string) {
   if (!value) return '--';
   try {
     return new Intl.DateTimeFormat('vi-VN', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
     }).format(new Date(value));
   } catch {
     return '--';
   }
+}
+
+function formatPrice(value: number) {
+  return `${(value || 0).toLocaleString()}đ`;
+}
+
+function getVisiblePages(page: number, totalPages: number): number[] {
+  const pages: number[] = [];
+  const maxVisible = 5;
+  let start = Math.max(1, page - Math.floor(maxVisible / 2));
+  const end = Math.min(totalPages, start + maxVisible - 1);
+  start = Math.max(1, end - maxVisible + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  return pages;
 }
 
 export default function AdminCoursesPage() {
@@ -137,143 +158,50 @@ export default function AdminCoursesPage() {
     return false;
   };
 
-  const columns = [
-    { title: 'Tên', dataIndex: 'name', key: 'name', ellipsis: true, width: 200 },
-    {
-      title: 'Tác giả',
-      key: 'author',
-      width: 140,
-      ellipsis: true,
-      render: (_: unknown, record: Course) => record.author?.fullName || '--',
-    },
-    {
-      title: 'Số bài học',
-      key: 'lectureCount',
-      width: 100,
-      render: (_: unknown, record: Course) => record.lectureCount ?? '--',
-    },
-    {
-      title: 'Giá',
-      dataIndex: 'price',
-      key: 'price',
-      render: (value: number) => `${(value || 0).toLocaleString()}đ`,
-      width: 100,
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'isPublished',
-      key: 'isPublished',
-      render: (value: boolean) => (
-        <Tag color={value ? 'green' : 'default'}>{statusLabel(value)}</Tag>
-      ),
-      width: 110,
-    },
-    {
-      title: 'Ngày tạo',
-      key: 'createdAt',
-      width: 110,
-      render: (_: unknown, record: Course) => formatDate(record.createdAt),
-    },
-    {
-      title: 'Cập nhật',
-      key: 'updatedAt',
-      width: 110,
-      render: (_: unknown, record: Course) => formatDate(record.updatedAt),
-    },
-    {
-      title: 'Hành động',
-      key: 'actions',
-      width: 160,
-      fixed: 'right',
-      render: (_: unknown, record: Course) => (
-        <Space size="small">
-          <Link to={`/admin/courses/${record.id}`}>
-            <Tooltip title="Xem nội dung">
-              <Button aria-label="Xem khoá học" icon={<EyeOutlined />} size="small" type="text" />
-            </Tooltip>
-          </Link>
-          <Tooltip title="Sửa thông tin">
-            <Button
-              aria-label="Sửa khoá học"
-              icon={<EditOutlined />}
-              onClick={() => openEdit(record)}
-              size="small"
-              type="text"
-            />
-          </Tooltip>
-          <Popconfirm title="Xoá khoá học?" onConfirm={() => deleteMutation.mutate(record.id)}>
-            <Tooltip title="Xoá">
-              <Button
-                aria-label="Xoá khoá học"
-                danger
-                icon={<DeleteOutlined />}
-                loading={deleteMutation.isPending}
-                size="small"
-                type="text"
-              />
-            </Tooltip>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+  const totalPages = data ? Math.ceil(data.total / limit) : 0;
+
+  const filterValue =
+    isPublishedFilter === undefined ? 'all' : isPublishedFilter ? 'published' : 'draft';
 
   return (
     <div>
-      <PageHeader
-        actions={[
-          {
-            key: 'create',
-            node: (
-              <Button
-                icon={<PlusOutlined />}
-                id="create-course"
-                onClick={() => navigate('/admin/courses/create')}
-                type="primary"
-              >
-                <span className="lms-btn-text-responsive">Thêm khoá học</span>
-              </Button>
-            ),
-          },
-        ]}
-        subtitle="Tạo, cập nhật và kiểm tra trạng thái xuất bản của các khoá học."
+      <AdminPageHead
         title="Quản lý khoá học"
+        subtitle="Tạo, cập nhật và kiểm tra trạng thái xuất bản của các khoá học."
       />
 
-      <Space
-        size="middle"
-        style={{ alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--spacing-4)' }}
-      >
-        <Input
-          allowClear
-          id="course-search-admin"
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-          placeholder="Tìm kiếm..."
-          prefix={<SearchOutlined />}
-          style={{ width: 360 }}
-          value={search}
-        />
-        <Select
-          aria-label="Lọc trạng thái xuất bản"
-          onChange={(value) => {
-            setIsPublishedFilter(value === 'all' ? undefined : value === 'published');
-            setPage(1);
-          }}
-          options={[
-            { label: 'Tất cả trạng thái', value: 'all' },
-            { label: 'Đã xuất bản', value: 'published' },
-            { label: 'Bản nháp', value: 'draft' },
-          ]}
-          placeholder="Trạng thái"
-          style={{ minWidth: 180 }}
-          value={
-            isPublishedFilter === undefined ? 'all' : isPublishedFilter ? 'published' : 'draft'
-          }
-        />
-      </Space>
+      <div className="lms-admin-courses-toolbar mt-4">
+        <div className="lms-admin-toolbar-left">
+          <AdminSearchInput
+            value={search}
+            onChange={(v) => {
+              setSearch(v);
+              setPage(1);
+            }}
+            id="course-search-admin"
+          />
+          <AdminFilterSelect
+            value={filterValue}
+            onChange={(v) => {
+              setIsPublishedFilter(v === 'all' ? undefined : v === 'published');
+              setPage(1);
+            }}
+            options={[
+              { label: 'Tất cả trạng thái', value: 'all' },
+              { label: 'Đã xuất bản', value: 'published' },
+              { label: 'Bản nháp', value: 'draft' },
+            ]}
+            ariaLabel="Lọc trạng thái xuất bản"
+          />
+        </div>
+        <AdminButton
+          variant="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate('/admin/courses/create')}
+        >
+          Thêm khoá học
+        </AdminButton>
+      </div>
 
       {isError ? <ErrorState inline onRetry={() => refetch()} /> : null}
 
@@ -321,23 +249,115 @@ export default function AdminCoursesPage() {
             ))}
           </div>
         ) : (
-          <Table<Course>
-            columns={columns}
-            dataSource={data.items}
-            pagination={{
-              current: page,
-              onChange: setPage,
-              pageSize: limit,
-              showSizeChanger: false,
-              total: data.total,
-            }}
-            rowKey="id"
-            scroll={{ x: 1200 }}
-          />
+          <div className="lms-admin-table-wrap">
+            <table className="lms-admin-table">
+              <thead>
+                <tr>
+                  <th>Tên khoá học</th>
+                  <th>Tác giả</th>
+                  <th>Số bài</th>
+                  <th>Giá</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.items.map((course) => (
+                  <tr key={course.id}>
+                    <td>
+                      <Link className="lms-admin-table__link" to={`/admin/courses/${course.id}`}>
+                        {course.name}
+                      </Link>
+                    </td>
+                    <td>{course.author?.fullName || '--'}</td>
+                    <td>{course.lectureCount ?? '--'}</td>
+                    <td>{formatPrice(course.price)}</td>
+                    <td>
+                      <span
+                        className={
+                          course.isPublished
+                            ? 'lms-admin-badge lms-admin-badge--success'
+                            : 'lms-admin-badge lms-admin-badge--draft'
+                        }
+                      >
+                        {statusLabel(course.isPublished)}
+                      </span>
+                    </td>
+                    <td>{formatDate(course.createdAt)}</td>
+                    <td>
+                      <div className="lms-admin-table-actions">
+                        <Link
+                          className="lms-admin-table-action"
+                          to={`/admin/courses/${course.id}`}
+                          title="Xem nội dung"
+                          aria-label="Xem khoá học"
+                        >
+                          <EyeOutlined />
+                        </Link>
+                        <button
+                          className="lms-admin-table-action"
+                          title="Sửa thông tin"
+                          aria-label="Sửa khoá học"
+                          onClick={() => openEdit(course)}
+                        >
+                          <EditOutlined />
+                        </button>
+                        <Popconfirm
+                          title="Xoá khoá học?"
+                          onConfirm={() => deleteMutation.mutate(course.id)}
+                        >
+                          <button
+                            className="lms-admin-table-action lms-admin-table-action--danger"
+                            title="Xoá"
+                            aria-label="Xoá khoá học"
+                          >
+                            <DeleteOutlined />
+                          </button>
+                        </Popconfirm>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {totalPages > 1 && (
+              <div className="lms-admin-pagination">
+                <button
+                  className="lms-admin-pagination__btn"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  ‹
+                </button>
+                {getVisiblePages(page, totalPages).map((p) => (
+                  <button
+                    key={p}
+                    className={
+                      p === page
+                        ? 'lms-admin-pagination__btn lms-admin-pagination__btn--active'
+                        : 'lms-admin-pagination__btn'
+                    }
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  className="lms-admin-pagination__btn"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  ›
+                </button>
+              </div>
+            )}
+          </div>
         )
       ) : null}
 
       <Modal
+        className="lms-admin-modal"
         confirmLoading={updateMutation.isPending}
         okText="Cập nhật"
         onCancel={() => {
@@ -347,7 +367,7 @@ export default function AdminCoursesPage() {
         onOk={handleSubmit}
         open={editModalOpen}
         title="Sửa khoá học"
-        width={600}
+        width={720}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 'var(--spacing-4)' }}>
           <Form.Item
@@ -404,18 +424,18 @@ export default function AdminCoursesPage() {
                       beforeUpload={(file) => handleThumbnailUpload(file as File)}
                       showUploadList={false}
                     >
-                      <Button type="primary" ghost icon={<UploadOutlined />}>
+                      <button className="lms-admin-btn lms-admin-btn--outline lms-admin-btn--sm">
+                        <UploadOutlined />
                         Thay đổi
-                      </Button>
+                      </button>
                     </Upload>
-                    <Button
-                      danger
-                      type="primary"
-                      icon={<UploadOutlined />}
+                    <button
+                      className="lms-admin-btn lms-admin-btn--danger lms-admin-btn--sm"
                       onClick={() => form.setFieldValue('thumbnail', '')}
                     >
+                      <UploadOutlined />
                       Xóa
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ) : (

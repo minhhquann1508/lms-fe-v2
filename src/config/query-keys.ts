@@ -49,4 +49,7 @@ export const queryKeys = {
     list: (params: Record<string, unknown>) => ['quizzes', 'list', params] as const,
     detail: (id: string) => ['quizzes', 'detail', id] as const,
   },
+  siteSettings: {
+    all: ['siteSettings'] as const,
+  },
 } as const;

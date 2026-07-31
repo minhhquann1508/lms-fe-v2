@@ -100,7 +100,14 @@ export default function QuizCreatePage() {
 
   const openCreateQuestion = () => {
     setEditingQuestionIndex(null);
-    questionForm.setFieldsValue({ content: '', points: 1, options: [{ content: '', isCorrect: true }, { content: '', isCorrect: false }] });
+    questionForm.setFieldsValue({
+      content: '',
+      points: 1,
+      options: [
+        { content: '', isCorrect: true },
+        { content: '', isCorrect: false },
+      ],
+    });
     setQuestionModalOpen(true);
   };
 
@@ -144,29 +151,55 @@ export default function QuizCreatePage() {
     key: index,
     label: (
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
-        <span style={{
-          background: '#1890ff',
-          color: '#fff',
-          borderRadius: 999,
-          padding: '2px 8px',
-          fontSize: 12,
-          fontWeight: 700,
-        }}>
+        <span
+          style={{
+            background: '#1890ff',
+            color: '#fff',
+            borderRadius: 999,
+            padding: '2px 8px',
+            fontSize: 12,
+            fontWeight: 700,
+          }}
+        >
           {index + 1}
         </span>
         <Text style={{ flex: 1 }} ellipsis={{ tooltip: q.content }}>
           {q.content}
         </Text>
-        <Text type="secondary" style={{ fontSize: 12 }}>{q.points} điểm</Text>
-        <Text type="secondary" style={{ fontSize: 12 }}>{q.options.length} lựa chọn</Text>
-        <Button icon={<EditOutlined />} size="small" type="text" onClick={(e) => { e.stopPropagation(); openEditQuestion(index); }} />
-        <Button danger icon={<DeleteOutlined />} size="small" type="text" onClick={(e) => { e.stopPropagation(); deleteQuestion(index); }} />
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {q.points} điểm
+        </Text>
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {q.options.length} lựa chọn
+        </Text>
+        <Button
+          icon={<EditOutlined />}
+          size="small"
+          type="text"
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditQuestion(index);
+          }}
+        />
+        <Button
+          danger
+          icon={<DeleteOutlined />}
+          size="small"
+          type="text"
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteQuestion(index);
+          }}
+        />
       </div>
     ),
     children: (
       <div>
         {q.options.map((opt, optIdx) => (
-          <div key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
+          <div
+            key={optIdx}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}
+          >
             <Text style={{ fontWeight: 600, width: 24 }}>{OPTION_LABELS[optIdx]}</Text>
             {opt.isCorrect ? (
               <CheckCircleFilled style={{ color: '#16a34a' }} />
@@ -198,7 +231,14 @@ export default function QuizCreatePage() {
       />
 
       <Form form={form} layout="vertical">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 16, alignItems: 'start' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 380px',
+            gap: 16,
+            alignItems: 'start',
+          }}
+        >
           <div>
             <Card title="Thông tin bài kiểm tra" className="lms-admin-card">
               <Form.Item
@@ -227,22 +267,38 @@ export default function QuizCreatePage() {
                 </Form.Item>
 
                 <Form.Item label="Thời gian (phút)" name="duration">
-                  <InputNumber min={0} placeholder="VD: 15" style={{ width: '100%' }} size="large" />
+                  <InputNumber
+                    min={0}
+                    placeholder="VD: 15"
+                    style={{ width: '100%' }}
+                    size="large"
+                  />
                 </Form.Item>
               </div>
 
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '12px 16px', background: 'var(--color-surface-muted)',
-                borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)',
-              }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  background: 'var(--color-surface-muted)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 14 }}>Công khai bài kiểm tra</div>
                   <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                     Cho phép học viên tìm thấy và làm bài kiểm tra
                   </div>
                 </div>
-                <Form.Item name="isPublished" valuePropName="checked" initialValue={false} style={{ margin: 0, flexShrink: 0 }}>
+                <Form.Item
+                  name="isPublished"
+                  valuePropName="checked"
+                  initialValue={false}
+                  style={{ margin: 0, flexShrink: 0 }}
+                >
                   <Switch className="lms-custom-switch" />
                 </Form.Item>
               </div>
@@ -260,7 +316,9 @@ export default function QuizCreatePage() {
             >
               {questions.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                  <Text type="secondary">Chưa có câu hỏi nào. Hãy thêm câu hỏi cho bài kiểm tra.</Text>
+                  <Text type="secondary">
+                    Chưa có câu hỏi nào. Hãy thêm câu hỏi cho bài kiểm tra.
+                  </Text>
                 </div>
               ) : (
                 <Collapse items={questionCollapseItems} expandIconPosition="end" />
@@ -281,7 +339,9 @@ export default function QuizCreatePage() {
                   }}
                 >
                   {(courses?.items ?? []).map((c) => (
-                    <Select.Option key={c.id} value={c.id}>{c.name}</Select.Option>
+                    <Select.Option key={c.id} value={c.id}>
+                      {c.name}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -294,7 +354,9 @@ export default function QuizCreatePage() {
                   disabled={!selectedCourseId}
                 >
                   {(chapters?.items ?? []).map((ch) => (
-                    <Select.Option key={ch.id} value={ch.id}>{ch.name}</Select.Option>
+                    <Select.Option key={ch.id} value={ch.id}>
+                      {ch.name}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -325,7 +387,7 @@ export default function QuizCreatePage() {
         onOk={handleQuestionSubmit}
         open={questionModalOpen}
         title={editingQuestionIndex !== null ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}
-        width={640}
+        width={720}
       >
         <Form form={questionForm} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
@@ -351,7 +413,10 @@ export default function QuizCreatePage() {
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name, ...restField }) => (
-                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div
+                    key={key}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}
+                  >
                     <Form.Item
                       {...restField}
                       name={[name, 'content']}
@@ -371,11 +436,21 @@ export default function QuizCreatePage() {
                       </Checkbox>
                     </Form.Item>
                     {fields.length > 2 && (
-                      <Button danger icon={<DeleteOutlined />} size="small" onClick={() => remove(name)} />
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        size="small"
+                        onClick={() => remove(name)}
+                      />
                     )}
                   </div>
                 ))}
-                <Button type="dashed" icon={<PlusOutlined />} onClick={() => add({ content: '', isCorrect: false })} style={{ width: '100%' }}>
+                <Button
+                  type="dashed"
+                  icon={<PlusOutlined />}
+                  onClick={() => add({ content: '', isCorrect: false })}
+                  style={{ width: '100%' }}
+                >
                   Thêm lựa chọn
                 </Button>
               </>

@@ -1,13 +1,17 @@
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import { Table } from 'antd';
 
-export interface DataTableColumn<RecordType extends { id: string }>
-  extends Omit<ColumnsType<RecordType>[number], 'key'> {
+export interface DataTableColumn<RecordType extends { id: string }> extends Omit<
+  ColumnsType<RecordType>[number],
+  'key'
+> {
   width?: number | string;
 }
 
-interface DataTableProps<RecordType extends { id: string }>
-  extends Omit<TableProps<RecordType>, 'columns'> {
+interface DataTableProps<RecordType extends { id: string }> extends Omit<
+  TableProps<RecordType>,
+  'columns'
+> {
   columns: DataTableColumn<RecordType>[];
   dataSource?: RecordType[];
 }

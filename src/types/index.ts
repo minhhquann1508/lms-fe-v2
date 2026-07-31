@@ -12,3 +12,4 @@ export * from './learning.type';
 export * from './dashboard.type';
 export * from './category.type';
 export * from './quiz.type';
+export * from './site-setting.type';

@@ -53,21 +53,24 @@ export const quizService = {
     return data as Quiz;
   },
 
-  async bulkUpdate(id: string, body: {
-    title: string;
-    description?: string;
-    type: string;
-    duration?: number;
-    isPublished?: boolean;
-    courseId?: string | null;
-    chapterId?: string | null;
-    questions: Array<{
-      id?: string;
-      content: string;
-      points: number;
-      options: Array<{ id?: string; content: string; isCorrect: boolean }>;
-    }>;
-  }): Promise<Quiz> {
+  async bulkUpdate(
+    id: string,
+    body: {
+      title: string;
+      description?: string;
+      type: string;
+      duration?: number;
+      isPublished?: boolean;
+      courseId?: string | null;
+      chapterId?: string | null;
+      questions: Array<{
+        id?: string;
+        content: string;
+        points: number;
+        options: Array<{ id?: string; content: string; isCorrect: boolean }>;
+      }>;
+    },
+  ): Promise<Quiz> {
     const { data } = await axios.put(`/quizzes/${id}/bulk-update`, body);
     return data as Quiz;
   },
@@ -81,7 +84,11 @@ export const quizService = {
     return data as Question;
   },
 
-  async updateQuestion(quizId: string, questionId: string, body: Partial<Question>): Promise<Question> {
+  async updateQuestion(
+    quizId: string,
+    questionId: string,
+    body: Partial<Question>,
+  ): Promise<Question> {
     const { data } = await axios.put(`/quizzes/${quizId}/questions/${questionId}`, body);
     return data as Question;
   },
@@ -90,13 +97,25 @@ export const quizService = {
     await axios.delete(`/quizzes/${quizId}/questions/${questionId}`);
   },
 
-  async createOption(quizId: string, questionId: string, body: Partial<QuestionOption>): Promise<QuestionOption> {
+  async createOption(
+    quizId: string,
+    questionId: string,
+    body: Partial<QuestionOption>,
+  ): Promise<QuestionOption> {
     const { data } = await axios.post(`/quizzes/${quizId}/questions/${questionId}/options`, body);
     return data as QuestionOption;
   },
 
-  async updateOption(quizId: string, questionId: string, optionId: string, body: Partial<QuestionOption>): Promise<QuestionOption> {
-    const { data } = await axios.put(`/quizzes/${quizId}/questions/${questionId}/options/${optionId}`, body);
+  async updateOption(
+    quizId: string,
+    questionId: string,
+    optionId: string,
+    body: Partial<QuestionOption>,
+  ): Promise<QuestionOption> {
+    const { data } = await axios.put(
+      `/quizzes/${quizId}/questions/${questionId}/options/${optionId}`,
+      body,
+    );
     return data as QuestionOption;
   },
 
@@ -145,10 +164,9 @@ export const quizService = {
     attemptId: string,
     answers: { questionId: string; selectedOptionId: string }[],
   ): Promise<QuizAttempt> {
-    const { data } = await axios.post(
-      `/quizzes/${quizId}/attempts/${attemptId}/submit`,
-      { answers },
-    );
+    const { data } = await axios.post(`/quizzes/${quizId}/attempts/${attemptId}/submit`, {
+      answers,
+    });
     return data as QuizAttempt;
   },
 

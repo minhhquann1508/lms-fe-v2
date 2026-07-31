@@ -1,9 +1,9 @@
-import { Tabs, Form, Input, Button, message, Divider } from 'antd';
-import { GoogleOutlined, MailOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { message } from 'antd';
+import { GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { loginSchema, registerSchema } from '@/schemas';
 import type { LoginFormValues, RegisterFormValues } from '@/schemas';
 import { authService } from '@/services';
@@ -16,25 +16,80 @@ import { getAuthErrorMessage } from '@/utils/auth-error-message';
 import { ACCOUNT_IN_USE_CODE, getActiveDevices } from '@/utils/device-limit-error';
 import type { ActiveLoginDevice } from '@/types';
 
+type ForgotMode = 'login' | 'forgot' | 'sent';
+
+function EmailIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M22 4L12 13 2 4" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      <circle cx="12" cy="16" r="1" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M20 21a8 8 0 1 0-16 0" />
+    </svg>
+  );
+}
+
 export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [revoking, setRevoking] = useState(false);
   const [deviceLimitOpen, setDeviceLimitOpen] = useState(false);
   const [activeDevices, setActiveDevices] = useState<ActiveLoginDevice[]>([]);
-  const [forgotMode, setForgotMode] = useState<'login' | 'forgot' | 'sent'>('login');
+  const [forgotMode, setForgotMode] = useState<ForgotMode>('login');
   const [forgotEmail, setForgotEmail] = useState('');
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { setAuth } = useAuthStore();
 
-  // Read revokeSessionId from URL (set by GoogleCallbackPage redirect)
-  const pendingRevokeSessionId = useRef(searchParams.get('revokeSessionId'));
-  // Clean up the URL param after reading
-  if (pendingRevokeSessionId.current && searchParams.has('revokeSessionId')) {
-    const next = new URLSearchParams(searchParams);
-    next.delete('revokeSessionId');
-    setSearchParams(next, { replace: true });
-  }
+  const pendingRevokeSessionId = useRef<string | null>(null);
+
+  useEffect(() => {
+    const revokeId = searchParams.get('revokeSessionId');
+    if (revokeId) {
+      pendingRevokeSessionId.current = revokeId;
+      const next = new URLSearchParams(searchParams);
+      next.delete('revokeSessionId');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   /* ── Login form ── */
   const loginForm = useForm<LoginFormValues>({
@@ -49,7 +104,6 @@ export default function AuthPage() {
       const res = await authService.login({ ...values, device, revokeSessionId });
       setAuth(res.data.userInfo, res.data.token);
       message.success('Đăng nhập thành công!');
-
       const role = res.data.userInfo.roleCode;
       if (role === ADMIN || role === SUPER_ADMIN) {
         navigate('/admin/dashboard');
@@ -62,12 +116,10 @@ export default function AuthPage() {
         setDeviceLimitOpen(true);
         return;
       }
-
       if (isApiError(err)) {
         message.error(getAuthErrorMessage(err.code ?? err.message));
         return;
       }
-
       message.error('Đăng nhập thất bại');
     } finally {
       setLoading(false);
@@ -76,14 +128,10 @@ export default function AuthPage() {
 
   const onLogin = (values: LoginFormValues) => {
     const revokeId = pendingRevokeSessionId.current ?? undefined;
-    pendingRevokeSessionId.current = null; // only use once
+    pendingRevokeSessionId.current = null;
     return doLogin(values, revokeId);
   };
 
-  /**
-   * Revoke the earliest active session and retry login.
-   * Sessions are sorted by loginAt DESC — the last element is the earliest.
-   */
   const handleRevokeEarliest = () => {
     if (activeDevices.length === 0) return;
     const earliest = activeDevices[activeDevices.length - 1];
@@ -91,14 +139,10 @@ export default function AuthPage() {
       message.error('Không thể xác định phiên đăng nhập sớm nhất.');
       return;
     }
-
     const currentValues = loginForm.getValues();
     setRevoking(true);
     setDeviceLimitOpen(false);
-
-    doLogin(currentValues, earliest.sessionId).finally(() => {
-      setRevoking(false);
-    });
+    doLogin(currentValues, earliest.sessionId).finally(() => setRevoking(false));
   };
 
   /* ── Register form ── */
@@ -125,7 +169,6 @@ export default function AuthPage() {
         message.error(getAuthErrorMessage(err.code ?? err.message));
         return;
       }
-
       message.error('Đăng ký thất bại');
     } finally {
       setLoading(false);
@@ -152,233 +195,291 @@ export default function AuthPage() {
     }
   };
 
-  return (
-    <>
-      {forgotMode === 'sent' ? (
-        <div className="lms-auth-forgot-sent">
-          <MailOutlined style={{ fontSize: 40, color: '#1677ff', marginBottom: 16 }} />
-          <h2>Kiểm tra email của bạn</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
+  const handleForgotSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const emailInput = e.currentTarget.elements.namedItem('email') as HTMLInputElement;
+    if (emailInput?.value) onForgotPassword(emailInput.value);
+  };
+
+  /* ── Render ── */
+  if (forgotMode === 'sent') {
+    return (
+      <div className="lms-auth-card">
+        <div className="lms-auth-sent">
+          <div className="lms-auth-sent__icon">
+            <MailOutlined />
+          </div>
+          <h2 className="lms-auth-sent__title">Kiểm tra email của bạn</h2>
+          <p className="lms-auth-sent__text">
             Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu tới <strong>{forgotEmail}</strong>. Vui lòng
             kiểm tra hộp thư.
           </p>
-          <Button type="link" onClick={() => setForgotMode('login')}>
+          <button className="lms-auth-link" onClick={() => setForgotMode('login')}>
             Quay lại đăng nhập
-          </Button>
+          </button>
         </div>
-      ) : forgotMode === 'forgot' ? (
-        <div className="lms-auth-forgot">
-          <h2 style={{ marginBottom: 8, textAlign: 'center' }}>Quên mật khẩu</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 24, textAlign: 'center' }}>
-            Nhập email để nhận liên kết đặt lại mật khẩu
-          </p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.currentTarget;
-              const emailInput = form.elements.namedItem('email') as HTMLInputElement;
-              if (emailInput?.value) {
-                onForgotPassword(emailInput.value);
-              }
-            }}
-          >
-            <Form.Item style={{ marginBottom: 16 }}>
-              <Input
-                prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
-                placeholder="Email"
-                size="large"
+      </div>
+    );
+  }
+
+  if (forgotMode === 'forgot') {
+    return (
+      <div className="lms-auth-card">
+        <h2 className="lms-auth-forgot__title">Quên mật khẩu</h2>
+        <p className="lms-auth-forgot__desc">Nhập email để nhận liên kết đặt lại mật khẩu</p>
+        <form onSubmit={handleForgotSubmit}>
+          <div className="lms-auth-form-group">
+            <label className="lms-auth-form-label" htmlFor="forgot-email">
+              Email
+            </label>
+            <div className="lms-auth-input-wrap">
+              <span className="lms-auth-input-icon">
+                <EmailIcon />
+              </span>
+              <input
+                className="lms-auth-input"
+                id="forgot-email"
                 name="email"
                 type="email"
+                placeholder="Email của bạn"
                 required
               />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block size="large">
-              Gửi liên kết đặt lại
-            </Button>
-            <div style={{ textAlign: 'center', marginTop: 16 }}>
-              <Button type="link" onClick={() => setForgotMode('login')}>
-                Quay lại đăng nhập
-              </Button>
             </div>
-          </form>
-        </div>
-      ) : (
-        /* ── Login / Register tabs ── */
-        <Tabs
-          className="lms-auth-tabs"
-          defaultActiveKey="login"
-          centered
-          items={[
-            {
-              key: 'login',
-              label: 'Đăng nhập',
-              children: (
-                <form onSubmit={loginForm.handleSubmit(onLogin)}>
-                  <Controller
-                    name="email"
-                    control={loginForm.control}
-                    render={({ field, fieldState }) => (
-                      <Form.Item
-                        validateStatus={fieldState.error ? 'error' : undefined}
-                        help={fieldState.error?.message}
-                        style={{ marginBottom: 16 }}
-                      >
-                        <Input
-                          {...field}
-                          prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
-                          placeholder="Email"
-                          size="large"
-                          id="login-email"
-                        />
-                      </Form.Item>
-                    )}
-                  />
-                  <Controller
-                    name="password"
-                    control={loginForm.control}
-                    render={({ field, fieldState }) => (
-                      <Form.Item
-                        validateStatus={fieldState.error ? 'error' : undefined}
-                        help={fieldState.error?.message}
-                        style={{ marginBottom: 24 }}
-                      >
-                        <Input.Password
-                          {...field}
-                          prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
-                          placeholder="Mật khẩu"
-                          size="large"
-                          id="login-password"
-                        />
-                      </Form.Item>
-                    )}
-                  />
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={loading}
-                    block
-                    size="large"
-                    id="login-submit"
-                  >
-                    Đăng nhập
-                  </Button>
+          </div>
+          <button className="lms-auth-btn-primary" type="submit" disabled={loading}>
+            Gửi liên kết đặt lại
+          </button>
+          <div className="lms-auth-forgot__back">
+            <button className="lms-auth-link" onClick={() => setForgotMode('login')}>
+              Quay lại đăng nhập
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
-                  <div style={{ textAlign: 'right', marginTop: 8, marginBottom: 8 }}>
-                    <Button type="link" size="small" onClick={() => setForgotMode('forgot')}>
-                      Quên mật khẩu?
-                    </Button>
-                  </div>
+  return (
+    <div className="lms-auth-card">
+      <h2 className="lms-auth-card__title">Chào mừng trở lại</h2>
+      <p className="lms-auth-card__subtitle">Vui lòng đăng nhập hoặc đăng ký để tiếp tục.</p>
 
-                  <Divider plain>hoặc</Divider>
-                  <Button
-                    block
-                    size="large"
-                    icon={<GoogleOutlined />}
-                    onClick={handleGoogleLogin}
-                    id="google-login"
-                  >
-                    Đăng nhập bằng Google
-                  </Button>
-                </form>
-              ),
-            },
-            {
-              key: 'register',
-              label: 'Đăng ký',
-              children: (
-                <form onSubmit={registerForm.handleSubmit(onRegister)}>
-                  <Controller
-                    name="fullName"
-                    control={registerForm.control}
-                    render={({ field, fieldState }) => (
-                      <Form.Item
-                        validateStatus={fieldState.error ? 'error' : undefined}
-                        help={fieldState.error?.message}
-                        style={{ marginBottom: 16 }}
-                      >
-                        <Input
-                          {...field}
-                          prefix={<UserOutlined style={{ color: '#9ca3af' }} />}
-                          placeholder="Họ tên"
-                          size="large"
-                          id="register-fullname"
-                        />
-                      </Form.Item>
-                    )}
+      {/* Google Login */}
+      <button className="lms-auth-btn-google" onClick={handleGoogleLogin} id="google-login">
+        <GoogleOutlined className="lms-auth-btn-google__icon" />
+        Đăng nhập bằng Google
+      </button>
+
+      <div className="lms-auth-divider">hoặc</div>
+
+      {/* Tabs */}
+      <div className="lms-auth-tabs">
+        <button
+          className={`lms-auth-tab${activeTab === 'login' ? ' lms-auth-tab--active' : ''}`}
+          onClick={() => setActiveTab('login')}
+        >
+          Đăng nhập
+        </button>
+        <button
+          className={`lms-auth-tab${activeTab === 'register' ? ' lms-auth-tab--active' : ''}`}
+          onClick={() => setActiveTab('register')}
+        >
+          Đăng ký
+        </button>
+      </div>
+
+      {/* Login Form */}
+      {activeTab === 'login' && (
+        // eslint-disable-next-line react-hooks/refs
+        <form onSubmit={loginForm.handleSubmit(onLogin)}>
+          <Controller
+            name="email"
+            control={loginForm.control}
+            render={({ field, fieldState }) => (
+              <div className="lms-auth-form-group">
+                <label className="lms-auth-form-label" htmlFor="login-email">
+                  Email
+                </label>
+                <div className="lms-auth-input-wrap">
+                  <span className="lms-auth-input-icon">
+                    <EmailIcon />
+                  </span>
+                  <input
+                    {...field}
+                    className={`lms-auth-input${fieldState.error ? ' lms-auth-input--has-error' : ''}`}
+                    id="login-email"
+                    type="email"
+                    placeholder="Email của bạn"
+                    autoComplete="email"
                   />
-                  <Controller
-                    name="email"
-                    control={registerForm.control}
-                    render={({ field, fieldState }) => (
-                      <Form.Item
-                        validateStatus={fieldState.error ? 'error' : undefined}
-                        help={fieldState.error?.message}
-                        style={{ marginBottom: 16 }}
-                      >
-                        <Input
-                          {...field}
-                          prefix={<MailOutlined style={{ color: '#9ca3af' }} />}
-                          placeholder="Email"
-                          size="large"
-                          id="register-email"
-                        />
-                      </Form.Item>
-                    )}
+                </div>
+                {fieldState.error && <p className="lms-auth-error">{fieldState.error.message}</p>}
+              </div>
+            )}
+          />
+
+          <Controller
+            name="password"
+            control={loginForm.control}
+            render={({ field, fieldState }) => (
+              <div className="lms-auth-form-group">
+                <label className="lms-auth-form-label" htmlFor="login-password">
+                  Mật khẩu
+                </label>
+                <div className="lms-auth-input-wrap">
+                  <span className="lms-auth-input-icon">
+                    <LockIcon />
+                  </span>
+                  <input
+                    {...field}
+                    className={`lms-auth-input${fieldState.error ? ' lms-auth-input--has-error' : ''}`}
+                    id="login-password"
+                    type="password"
+                    placeholder="Mật khẩu của bạn"
+                    autoComplete="current-password"
                   />
-                  <Controller
-                    name="password"
-                    control={registerForm.control}
-                    render={({ field, fieldState }) => (
-                      <Form.Item
-                        validateStatus={fieldState.error ? 'error' : undefined}
-                        help={fieldState.error?.message}
-                        style={{ marginBottom: 16 }}
-                      >
-                        <Input.Password
-                          {...field}
-                          prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
-                          placeholder="Mật khẩu (ít nhất 6 ký tự)"
-                          size="large"
-                          id="register-password"
-                        />
-                      </Form.Item>
-                    )}
-                  />
-                  <Controller
-                    name="confirmPassword"
-                    control={registerForm.control}
-                    render={({ field, fieldState }) => (
-                      <Form.Item
-                        validateStatus={fieldState.error ? 'error' : undefined}
-                        help={fieldState.error?.message}
-                        style={{ marginBottom: 24 }}
-                      >
-                        <Input.Password
-                          {...field}
-                          prefix={<LockOutlined style={{ color: '#9ca3af' }} />}
-                          placeholder="Xác nhận mật khẩu"
-                          size="large"
-                          id="register-confirm-password"
-                        />
-                      </Form.Item>
-                    )}
-                  />
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={loading}
-                    block
-                    size="large"
-                    id="register-submit"
-                  >
-                    Đăng ký
-                  </Button>
-                </form>
-              ),
-            },
-          ]}
-        />
+                </div>
+                {fieldState.error && <p className="lms-auth-error">{fieldState.error.message}</p>}
+              </div>
+            )}
+          />
+
+          <button
+            className="lms-auth-btn-primary"
+            type="submit"
+            disabled={loading}
+            id="login-submit"
+          >
+            Đăng nhập
+          </button>
+
+          <div className="lms-auth-form-footer" style={{ marginTop: 8 }}>
+            <span />
+            <button className="lms-auth-link" type="button" onClick={() => setForgotMode('forgot')}>
+              Quên mật khẩu?
+            </button>
+          </div>
+        </form>
       )}
+
+      {/* Register Form */}
+      {activeTab === 'register' && (
+        <form onSubmit={registerForm.handleSubmit(onRegister)}>
+          <Controller
+            name="fullName"
+            control={registerForm.control}
+            render={({ field, fieldState }) => (
+              <div className="lms-auth-form-group">
+                <label className="lms-auth-form-label" htmlFor="register-fullname">
+                  Họ tên
+                </label>
+                <div className="lms-auth-input-wrap">
+                  <span className="lms-auth-input-icon">
+                    <UserIcon />
+                  </span>
+                  <input
+                    {...field}
+                    className={`lms-auth-input${fieldState.error ? ' lms-auth-input--has-error' : ''}`}
+                    id="register-fullname"
+                    type="text"
+                    placeholder="Họ và tên của bạn"
+                    autoComplete="name"
+                  />
+                </div>
+                {fieldState.error && <p className="lms-auth-error">{fieldState.error.message}</p>}
+              </div>
+            )}
+          />
+
+          <Controller
+            name="email"
+            control={registerForm.control}
+            render={({ field, fieldState }) => (
+              <div className="lms-auth-form-group">
+                <label className="lms-auth-form-label" htmlFor="register-email">
+                  Email
+                </label>
+                <div className="lms-auth-input-wrap">
+                  <span className="lms-auth-input-icon">
+                    <EmailIcon />
+                  </span>
+                  <input
+                    {...field}
+                    className={`lms-auth-input${fieldState.error ? ' lms-auth-input--has-error' : ''}`}
+                    id="register-email"
+                    type="email"
+                    placeholder="Email của bạn"
+                    autoComplete="email"
+                  />
+                </div>
+                {fieldState.error && <p className="lms-auth-error">{fieldState.error.message}</p>}
+              </div>
+            )}
+          />
+
+          <Controller
+            name="password"
+            control={registerForm.control}
+            render={({ field, fieldState }) => (
+              <div className="lms-auth-form-group">
+                <label className="lms-auth-form-label" htmlFor="register-password">
+                  Mật khẩu
+                </label>
+                <div className="lms-auth-input-wrap">
+                  <span className="lms-auth-input-icon">
+                    <LockIcon />
+                  </span>
+                  <input
+                    {...field}
+                    className={`lms-auth-input${fieldState.error ? ' lms-auth-input--has-error' : ''}`}
+                    id="register-password"
+                    type="password"
+                    placeholder="Mật khẩu (ít nhất 6 ký tự)"
+                    autoComplete="new-password"
+                  />
+                </div>
+                {fieldState.error && <p className="lms-auth-error">{fieldState.error.message}</p>}
+              </div>
+            )}
+          />
+
+          <Controller
+            name="confirmPassword"
+            control={registerForm.control}
+            render={({ field, fieldState }) => (
+              <div className="lms-auth-form-group">
+                <label className="lms-auth-form-label" htmlFor="register-confirm-password">
+                  Xác nhận mật khẩu
+                </label>
+                <div className="lms-auth-input-wrap">
+                  <span className="lms-auth-input-icon">
+                    <LockIcon />
+                  </span>
+                  <input
+                    {...field}
+                    className={`lms-auth-input${fieldState.error ? ' lms-auth-input--has-error' : ''}`}
+                    id="register-confirm-password"
+                    type="password"
+                    placeholder="Xác nhận mật khẩu"
+                    autoComplete="new-password"
+                  />
+                </div>
+                {fieldState.error && <p className="lms-auth-error">{fieldState.error.message}</p>}
+              </div>
+            )}
+          />
+
+          <button
+            className="lms-auth-btn-primary"
+            type="submit"
+            disabled={loading}
+            id="register-submit"
+          >
+            Đăng ký
+          </button>
+        </form>
+      )}
+
       <DeviceLimitModal
         activeDevices={activeDevices}
         onClose={() => setDeviceLimitOpen(false)}
@@ -386,6 +487,6 @@ export default function AuthPage() {
         open={deviceLimitOpen}
         revoking={revoking}
       />
-    </>
+    </div>
   );
 }

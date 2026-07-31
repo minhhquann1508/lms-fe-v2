@@ -24,6 +24,12 @@ export interface ReviewEnrollmentPayload {
   reviewNote?: string;
 }
 
+export interface DirectEnrollResponse {
+  created: number;
+  skipped: number;
+  enrollments: Enrollment[];
+}
+
 export const enrollmentService = {
   async getById(enrollmentId: string): Promise<Enrollment> {
     const res = (await axios.get(
@@ -99,6 +105,14 @@ export const enrollmentService = {
       `/enrollments/${enrollmentId}/review`,
       payload,
     )) as unknown as ApiEnvelope<Enrollment>;
+    return res.data;
+  },
+
+  async addDirect(
+    courseId: string,
+    userIds: string[],
+  ): Promise<DirectEnrollResponse> {
+    const res = (await axios.post('/enrollments/direct', { courseId, userIds })) as unknown as ApiEnvelope<DirectEnrollResponse>;
     return res.data;
   },
 };

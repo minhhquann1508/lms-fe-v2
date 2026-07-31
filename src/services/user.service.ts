@@ -28,12 +28,16 @@ export const userService = {
   },
 
   async updateRole(userId: string, roleCode: string): Promise<UserInfo> {
-    const res = (await axios.patch(`/users/${userId}/role`, { roleCode })) as unknown as ApiEnvelope<UserInfo>;
+    const res = (await axios.patch(`/users/${userId}/role`, {
+      roleCode,
+    })) as unknown as ApiEnvelope<UserInfo>;
     return res.data;
   },
 
   async toggleActive(userId: string): Promise<UserInfo> {
-    const res = (await axios.patch(`/users/${userId}/toggle-active`)) as unknown as ApiEnvelope<UserInfo>;
+    const res = (await axios.patch(
+      `/users/${userId}/toggle-active`,
+    )) as unknown as ApiEnvelope<UserInfo>;
     return res.data;
   },
 

@@ -23,10 +23,18 @@ export const authService = {
   },
 
   forgotPassword(email: string): Promise<ApiEnvelope<{ message: string }>> {
-    return axios.post('/auth/forgot-password', { email }) as Promise<ApiEnvelope<{ message: string }>>;
+    return axios.post('/auth/forgot-password', { email }) as Promise<
+      ApiEnvelope<{ message: string }>
+    >;
   },
 
-  resetPassword(token: string, email: string, password: string): Promise<ApiEnvelope<{ message: string }>> {
-    return axios.post('/auth/reset-password', { token, email, password }) as Promise<ApiEnvelope<{ message: string }>>;
+  resetPassword(
+    token: string,
+    email: string,
+    password: string,
+  ): Promise<ApiEnvelope<{ message: string }>> {
+    return axios.post('/auth/reset-password', { token, email, password }) as Promise<
+      ApiEnvelope<{ message: string }>
+    >;
   },
 };

@@ -12,6 +12,7 @@ export { notificationService } from './notification.service';
 export { categoryService } from './category.service';
 export { publicService } from './public.service';
 export { quizService } from './quiz.service';
+export { siteSettingService } from './site-setting.service';
 export type { JobStatus } from './job.service';
 export * from './session.service';
 export * from './device.service';
