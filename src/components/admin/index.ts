@@ -9,3 +9,4 @@ export { default as AdminSearchInput } from './AdminSearchInput';
 export { default as AdminFilterSelect } from './AdminFilterSelect';
 export { default as AdminListPageShell } from './AdminListPageShell';
 export { default as ItemPickerModal } from './ItemPickerModal';
+export { default as CoursePublishField } from './CoursePublishField';

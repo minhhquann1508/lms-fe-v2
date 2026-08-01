@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Form, Input, InputNumber, Select, Switch, Upload, message } from 'antd';
+import { Button, Card, Form, Input, InputNumber, Select, Upload, message } from 'antd';
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
-import { PageHeader } from '@/components';
+import { CoursePublishField, PageHeader } from '@/components';
 import { courseService, categoryService, uploadService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
 import { usePageTitle } from '@/hooks';
@@ -100,13 +100,13 @@ export default function CourseCreatePage() {
                 name="price"
                 rules={[{ required: true, message: 'Vui lòng nhập giá bán' }]}
               >
-                <InputNumber
+                <InputNumber<number>
                   min={0}
                   size="large"
                   style={{ width: '100%' }}
                   placeholder="VD: 500,000"
                   formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value) => Number(value?.replace(/,/g, '')) as unknown as string}
+                  parser={(value) => Number(value?.replace(/,/g, '') || 0)}
                 />
               </Form.Item>
             </Card>
@@ -167,27 +167,10 @@ export default function CourseCreatePage() {
             </Card>
 
             <Card className="lms-admin-card" title="Trạng thái xuất bản" style={{ marginTop: 16 }}>
-              <Form.Item name="isPublished" valuePropName="checked" style={{ margin: 0 }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px 16px',
-                    background: 'var(--color-surface-muted)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--color-border)',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>Công khai khoá học</div>
-                    <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      Cho phép học viên tìm thấy và đăng ký
-                    </div>
-                  </div>
-                  <Switch className="lms-custom-switch" />
-                </div>
-              </Form.Item>
+              <CoursePublishField
+                title="Công khai khoá học"
+                description="Cho phép học viên tìm thấy và đăng ký"
+              />
             </Card>
           </div>
         </div>
