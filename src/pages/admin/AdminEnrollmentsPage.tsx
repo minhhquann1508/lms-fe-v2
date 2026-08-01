@@ -17,6 +17,7 @@ import { EmptyState, ErrorState, LoadingSkeleton, PageHeader } from '@/component
 import { queryKeys } from '@/config/query-keys';
 import { enrollmentService } from '@/services';
 import { useDebounce, usePageTitle } from '@/hooks';
+import { shouldShowEnrollmentReviewActions } from './enrollment-actions';
 import type { Enrollment } from '@/types';
 
 const { Paragraph, Text } = Typography;
@@ -276,47 +277,47 @@ export default function AdminEnrollmentsPage() {
                     </Paragraph>
                   ) : null}
 
-                  <Space
-                    className="lms-admin-course-detail__approval-actions"
-                    size={8}
-                    wrap
-                    style={{ marginTop: 'auto', paddingTop: '8px' }}
-                  >
-                    <Button
-                      disabled={enrollment.status !== 'pending'}
-                      loading={
-                        reviewEnrollment.isPending &&
-                        reviewEnrollment.variables?.enrollmentId === enrollment.id &&
-                        reviewEnrollment.variables?.status === 'active'
-                      }
-                      onClick={() =>
-                        reviewEnrollment.mutate({
-                          enrollmentId: enrollment.id,
-                          status: 'active',
-                        })
-                      }
-                      type="primary"
+                  {shouldShowEnrollmentReviewActions(enrollment.status) ? (
+                    <Space
+                      className="lms-admin-course-detail__approval-actions"
+                      size={8}
+                      wrap
+                      style={{ marginTop: 'auto', paddingTop: '8px' }}
                     >
-                      Duyệt vào học
-                    </Button>
-                    <Button
-                      danger
-                      disabled={enrollment.status !== 'pending'}
-                      loading={
-                        reviewEnrollment.isPending &&
-                        reviewEnrollment.variables?.enrollmentId === enrollment.id &&
-                        reviewEnrollment.variables?.status === 'rejected'
-                      }
-                      onClick={() =>
-                        reviewEnrollment.mutate({
-                          enrollmentId: enrollment.id,
-                          status: 'rejected',
-                        })
-                      }
-                    >
-                      Từ chối
-                    </Button>
-                  </Space>
+                      <Button
+                        loading={
+                          reviewEnrollment.isPending &&
+                          reviewEnrollment.variables?.enrollmentId === enrollment.id &&
+                          reviewEnrollment.variables?.status === 'active'
+                        }
+                        onClick={() =>
+                          reviewEnrollment.mutate({
+                            enrollmentId: enrollment.id,
+                            status: 'active',
+                          })
+                        }
+                        type="primary"
+                      >
+                        Duyệt vào học
+                      </Button>
+                      <Button
+                        danger
+                        loading={
+                          reviewEnrollment.isPending &&
+                          reviewEnrollment.variables?.enrollmentId === enrollment.id &&
+                          reviewEnrollment.variables?.status === 'rejected'
+                        }
+                        onClick={() =>
+                          reviewEnrollment.mutate({
+                            enrollmentId: enrollment.id,
+                            status: 'rejected',
+                          })
+                        }
+                      >
+                        Từ chối
+                      </Button>
+                    </Space>
+                  ) : null}
                 </article>
               ))}
             </div>

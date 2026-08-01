@@ -24,6 +24,7 @@ import { queryKeys } from '@/config/query-keys';
 import { useBreakpoint, usePageTitle } from '@/hooks';
 import { enrollmentService, lectureProgressService, quizService } from '@/services';
 import { isApiError } from '@/utils/api-error';
+import { buildBunnyEmbedUrl } from './bunny-embed-url';
 import type { UpdateEnrollmentLearningStatePayload } from '@/services/enrollment.service';
 import type {
   Chapter,
@@ -116,28 +117,6 @@ export function shouldSyncLectureTimeUpdate(
   if (nextSeconds === 0) return false;
   if (nextDuration > 0 && nextSeconds >= getCompletionThreshold(nextDuration)) return true;
   return nextSeconds >= nextDuration || nextSeconds - lastSyncedSeconds >= 10;
-}
-
-function isBunnyEmbedUrl(url: string): boolean {
-  return url.includes('mediadelivery.net/embed/');
-}
-
-function buildBunnyEmbedUrl(lecture: Lecture | null | undefined): string | null {
-  if (!lecture) return null;
-  const baseUrl =
-    lecture.attributes?.libraryId && lecture.attributes?.videoGuid
-      ? `https://iframe.mediadelivery.net/embed/${lecture.attributes.libraryId}/${lecture.attributes.videoGuid}`
-      : lecture.videoUrl?.trim() && isBunnyEmbedUrl(lecture.videoUrl)
-        ? lecture.videoUrl.trim()
-        : '';
-  if (!baseUrl) return null;
-  const url = new URL(baseUrl, window.location.origin);
-  url.searchParams.set('autoplay', 'false');
-  url.searchParams.set('preload', 'true');
-  url.searchParams.set('playsinline', 'true');
-  url.searchParams.set('responsive', 'true');
-  url.searchParams.set('v', lecture.id);
-  return url.toString();
 }
 
 export function resolveInitialLectureId(
