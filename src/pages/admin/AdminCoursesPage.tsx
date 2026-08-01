@@ -10,7 +10,6 @@ import {
   Popconfirm,
   Select,
   Space,
-  Switch,
   Upload,
   message,
 } from 'antd';
@@ -30,6 +29,7 @@ import {
   AdminButton,
   AdminSearchInput,
   AdminFilterSelect,
+  CoursePublishField,
 } from '@/components';
 import { courseService, categoryService, uploadService } from '@/services';
 import { queryKeys } from '@/config/query-keys';
@@ -400,13 +400,13 @@ export default function AdminCoursesPage() {
             name="price"
             rules={[{ required: true, message: 'Vui lòng nhập giá bán' }]}
           >
-            <InputNumber
+            <InputNumber<number>
               min={0}
               style={{ width: '100%' }}
               size="large"
               placeholder="VD: 500,000"
               formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={(value) => Number(value?.replace(/,/g, '')) as unknown as string}
+              parser={(value) => Number(value?.replace(/,/g, '') || 0)}
             />
           </Form.Item>
 
@@ -430,10 +430,11 @@ export default function AdminCoursesPage() {
                       </button>
                     </Upload>
                     <button
+                      type="button"
                       className="lms-admin-btn lms-admin-btn--danger lms-admin-btn--sm"
                       onClick={() => form.setFieldValue('thumbnail', '')}
                     >
-                      <UploadOutlined />
+                      <DeleteOutlined />
                       Xóa
                     </button>
                   </div>
@@ -461,31 +462,11 @@ export default function AdminCoursesPage() {
             </div>
           </Form.Item>
 
-          <Form.Item
-            name="isPublished"
-            valuePropName="checked"
-            style={{ marginBottom: 0, marginTop: 24 }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 16px',
-                background: 'var(--color-surface-muted)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border)',
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 14 }}>Trạng thái xuất bản</div>
-                <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                  Cho phép học viên tìm thấy và đăng ký khoá học này
-                </div>
-              </div>
-              <Switch className="lms-custom-switch" />
-            </div>
-          </Form.Item>
+          <CoursePublishField
+            title="Trạng thái xuất bản"
+            description="Cho phép học viên tìm thấy và đăng ký khoá học này"
+            className="mt-4"
+          />
         </Form>
       </Modal>
     </div>
