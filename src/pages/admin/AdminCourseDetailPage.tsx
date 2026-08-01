@@ -39,6 +39,7 @@ import { EmptyState, ErrorState, ItemPickerModal, AdminButton } from '@/componen
 import { useBreakpoint, usePageTitle } from '@/hooks';
 import { queryKeys } from '@/config/query-keys';
 import { chapterService, courseService, enrollmentService, lectureService, userService } from '@/services';
+import { shouldShowEnrollmentReviewActions } from './enrollment-actions';
 import type { Chapter, Enrollment, Lecture } from '@/types';
 import type { PickerItem } from '@/components/admin/ItemPickerModal';
 
@@ -379,7 +380,10 @@ export default function AdminCourseDetailPage() {
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const addUsersMutation = useMutation({
-    mutationFn: (userIds: string[]) => enrollmentService.addDirect(courseId, userIds),
+    mutationFn: (userIds: string[]) => {
+      if (!courseId) throw new Error('COURSE_NOT_SELECTED');
+      return enrollmentService.addDirect(courseId, userIds);
+    },
     onSuccess: (res) => {
       message.success(`Đã thêm ${res.created} học viên`);
       if (res.skipped > 0) {
@@ -902,30 +906,32 @@ export default function AdminCourseDetailPage() {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span className={`lms-admin-badge ${statusBadgeClass}`}>{statusLabel}</span>
-                    <button
-                      className="lms-admin-btn lms-admin-btn--primary lms-admin-btn--sm"
-                      disabled={enrollment.status === 'active'}
-                      onClick={() =>
-                        reviewEnrollment.mutate({
-                          enrollmentId: enrollment.id,
-                          status: 'active',
-                        })
-                      }
-                    >
-                      Duyệt vào học
-                    </button>
-                    <button
-                      className="lms-admin-btn lms-admin-btn--danger lms-admin-btn--sm"
-                      disabled={enrollment.status === 'rejected'}
-                      onClick={() =>
-                        reviewEnrollment.mutate({
-                          enrollmentId: enrollment.id,
-                          status: 'rejected',
-                        })
-                      }
-                    >
-                      Từ chối
-                    </button>
+                    {shouldShowEnrollmentReviewActions(enrollment.status) ? (
+                      <>
+                        <button
+                          className="lms-admin-btn lms-admin-btn--primary lms-admin-btn--sm"
+                          onClick={() =>
+                            reviewEnrollment.mutate({
+                              enrollmentId: enrollment.id,
+                              status: 'active',
+                            })
+                          }
+                        >
+                          Duyệt vào học
+                        </button>
+                        <button
+                          className="lms-admin-btn lms-admin-btn--danger lms-admin-btn--sm"
+                          onClick={() =>
+                            reviewEnrollment.mutate({
+                              enrollmentId: enrollment.id,
+                              status: 'rejected',
+                            })
+                          }
+                        >
+                          Từ chối
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                 </div>
               );
@@ -1166,7 +1172,9 @@ export default function AdminCourseDetailPage() {
             total: res.total,
           };
         }}
-        onSubmit={async (ids) => addUsersMutation.mutateAsync(ids)}
+        onSubmit={async (ids) => {
+          await addUsersMutation.mutateAsync(ids);
+        }}
         loading={addUsersMutation.isPending}
       />
     </div>
